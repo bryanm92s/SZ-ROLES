@@ -152,7 +152,8 @@ function UserCard({ user, color, isCurrentUser, onGoCitas, onGoGastos, netLabelW
           </div>
           <div style={{background:'#F1EAF9',borderRadius:10,padding:'10px',textAlign:'center'}}>
             <div style={{fontSize:13,fontWeight:800,color:'#7C5C9E'}}>${fmt(domMonto)}</div>
-            <div style={{fontSize:10,color:'#7C5C9E',fontWeight:600,marginTop:2}}>💲 Total domicilios</div>
+            <div style={{fontSize:10,color:'#7C5C9E',fontWeight:600,marginTop:2}}>💲 En domicilios</div>
+            <div style={{fontSize:9,color:'#9C8AB8',marginTop:1}}>incl. en ingresos</div>
           </div>
         </div>
       )}
@@ -296,7 +297,7 @@ export default function ReportsTab({ userEmail, userRole, sync, expenses, client
       ['Neto',             totIngresos - totMonto],
       [''],
       ['──── DESGLOSE POR USUARIO ────'],
-      ['Usuario','Correo','Citas creadas','Citas atendidas','Ingresos','Gastos #','Gastos $','Domicilios #','Domicilios $','Neto'],
+      ['Usuario','Correo','Citas creadas','Citas atendidas','Ingresos (incl. domicilios)','Gastos #','Gastos $','Domicilios #','Domicilios $','Neto'],
       ...users.slice().sort((a,b)=>(b.citasAtendidas+b.ingresos)-(a.citasAtendidas+a.ingresos)).map(u => [
         u.name || u.email.split('@')[0],
         u.email,
@@ -372,17 +373,17 @@ export default function ReportsTab({ userEmail, userRole, sync, expenses, client
       `${CHART} *Totales*`,
       `• Citas creadas: *${totCreadas}*`,
       `• Citas atendidas: *${totAtendidas}*`,
-      `• Ingresos: *${fmtM(totIngresos)}*`,
+      `• Ingresos (incl. domicilios): *${fmtM(totIngresos)}*`,
       `• Gastos: *${fmtM(totMonto)}*`,
       `• Neto: *${fmtM(totIngresos - totMonto)}*`,
-      `• Domicilios: *${totDom}* (${fmtM(totDomMonto)})`,
+      `• Domicilios: *${totDom}* (${fmtM(totDomMonto)} incl. en ingresos)`,
     ]
     if (users.length > 0) {
       lines.push('', `${PEOPLE} *Por persona*`)
       users.slice().sort((a,b)=>(b.citasAtendidas+b.ingresos)-(a.citasAtendidas+a.ingresos)).slice(0,8).forEach(u => {
         const quien = u.name || u.email.split('@')[0]
-        const domTxt = u.domAtendidas > 0 ? ` · 🛵 ${u.domAtendidas} domicilios (${fmtM(u.domAtendidasMonto)})` : ''
-        lines.push(`• ${quien}: ${u.citasCreadas} creadas · ${u.citasAtendidas} atendidas · ${fmtM(u.ingresos)} · gastos ${fmtM(u.montoGastos)}${domTxt}`)
+        const domTxt = u.domAtendidas > 0 ? ` · 🛵 ${u.domAtendidas} domicilios (${fmtM(u.domAtendidasMonto)} incl.)` : ''
+        lines.push(`• ${quien}: ${u.citasCreadas} creadas · ${u.citasAtendidas} atendidas · ${fmtM(u.ingresos)} (incl. domicilios) · gastos ${fmtM(u.montoGastos)}${domTxt}`)
       })
       if (users.length > 8) lines.push(`   …y ${users.length - 8} más`)
     }
@@ -457,7 +458,7 @@ export default function ReportsTab({ userEmail, userRole, sync, expenses, client
                 <StatCard label="Citas atendidas"  value={totAtendidas}           color='#059669'/>
                 <StatCard label="Total en gastos"  value={`$${fmt(totMonto)}`}    color='#B03030' sub={periodLabel()}/>
                 <StatCard label="Total ingresos"   value={`$${fmt(totIngresos)}`} color='#2E7D52' sub="citas completadas"/>
-                <StatCard label="Total domicilios" value={totDom}                 color='#7C5C9E' sub={`$${fmt(totDomMonto)} recaudado`}/>
+                <StatCard label="Total domicilios" value={totDom}                 color='#7C5C9E' sub={`$${fmt(totDomMonto)} (incl. en ingresos)`}/>
               </div>
 
               {users.length === 0 ? (

@@ -1,7 +1,7 @@
 // ╔══════════════════════════════════════════════════════════════╗
-// ║  Salome Zuluaga | SZ-ROLES                                   ║
-// ║  + Roles (Administradora / Empleada)                         ║
-// ║  + Reportes por usuario                                      ║
+// ║  Salome Zuluaga | Micropigmentación — Apps Script v8          ║
+// ║  + Roles (Administradora / Empleada)                          ║
+// ║  + Reportes por usuario                                       ║
 // ╚══════════════════════════════════════════════════════════════╝
 
 const SECRET_TOKEN = 'CAMBIA_TU_TOKEN';
@@ -1023,11 +1023,16 @@ function sendDailyReportEmail() {
     var totDomMonto = userList.reduce(function(s,u){ return s + u.domAtendidasMonto; }, 0);
 
     // ── Construir mensaje (réplica de sendWA de ReportsTab.jsx) ──
-    var SPARK  = '\u2728';       // ✨
-    var CAL    = '\uD83D\uDCC5'; // 📅
-    var CHART  = '\uD83D\uDCCA'; // 📊
-    var PEOPLE = '\uD83D\uDC65'; // 👥
-    var MOTO   = '\uD83D\uDEF5'; // 🛵
+    // Los emojis se construyen con String.fromCharCode + surrogate pairs
+    // (high surrogate 0xD800-0xDBFF, low surrogate 0xDC00-0xDFFF) en lugar
+    // de '\uXXXX' escapes. Esto evita que el editor/persistencia de Apps
+    // Script corrompa los caracteres por encoding — el string siempre se
+    // arma a runtime desde enteros, no desde bytes del archivo fuente.
+    var SPARK  = String.fromCharCode(0x2728);                                    // ✨
+    var CAL    = String.fromCharCode(0xD83D, 0xDCC5);                            // 📅
+    var CHART  = String.fromCharCode(0xD83D, 0xDCCA);                            // 📊
+    var PEOPLE = String.fromCharCode(0xD83D, 0xDC65);                            // 👥
+    var MOTO   = String.fromCharCode(0xD83D, 0xDEF5);                            // 🛵
 
     var lines = [];
     lines.push(SPARK + ' *Reporte de actividad del equipo*');
@@ -1036,10 +1041,10 @@ function sendDailyReportEmail() {
     lines.push(CHART + ' *Totales*');
     lines.push('• Citas creadas: *' + totCreadas + '*');
     lines.push('• Citas atendidas: *' + totAtendidas + '*');
-    lines.push('• Ingresos: *' + _dailyReportFmtMonto(totIngresos) + '*');
+    lines.push('• Ingresos (incl. domicilios): *' + _dailyReportFmtMonto(totIngresos) + '*');
     lines.push('• Gastos: *' + _dailyReportFmtMonto(totMonto) + '*');
     lines.push('• Neto: *' + _dailyReportFmtMonto(totIngresos - totMonto) + '*');
-    lines.push('• Domicilios: *' + totDom + '* (' + _dailyReportFmtMonto(totDomMonto) + ')');
+    lines.push('• Domicilios: *' + totDom + '* (' + _dailyReportFmtMonto(totDomMonto) + ' incl. en ingresos)');
 
     if (userList.length > 0) {
       lines.push('', PEOPLE + ' *Por persona*');
@@ -1049,13 +1054,16 @@ function sendDailyReportEmail() {
       sorted.forEach(function(u){
         var quien = u.name || u.email.split('@')[0];
         var domTxt = u.domAtendidas > 0
-          ? ' · ' + MOTO + ' ' + u.domAtendidas + ' domicilios (' + _dailyReportFmtMonto(u.domAtendidasMonto) + ')'
+          ? ' · ' + MOTO + ' ' + u.domAtendidas + ' domicilios (' + _dailyReportFmtMonto(u.domAtendidasMonto) + ' incl.)'
           : '';
         lines.push('• ' + quien + ': ' + u.citasCreadas + ' creadas · ' + u.citasAtendidas +
                    ' atendidas · ' + _dailyReportFmtMonto(u.ingresos) + ' · gastos ' +
                    _dailyReportFmtMonto(u.montoGastos) + domTxt);
       });
-      if (userList.length > 8) lines.push('   …y ' + (userList.length - 8) + ' más');
+      if (userList.length > 8) {
+        var ELLIPSIS = String.fromCharCode(0x2026);
+        lines.push('   ' + ELLIPSIS + 'y ' + (userList.length - 8) + ' más');
+      }
     }
     lines.push('', '_Generado ' + Utilities.formatDate(now, tz, "yyyy-MM-dd HH:mm:ss") + '_');
 
@@ -1076,10 +1084,14 @@ function sendDailyReportEmail() {
              + 'Puedes activarlo/desactivarlo desde Apps Script con '
              + '<code>setupDailyReportTrigger()</code> / <code>removeDailyReportTrigger()</code>.</small>';
 
-    GmailApp.sendEmail(recipient, subject, msg, { htmlBody: html });
-    console.log('✅ Reporte diario enviado a ' + recipient);
+    // Forzar charset UTF-8 en el cuerpo plano (4º argumento). Apps Script
+    // suele enviar en latin-1 si no se especifica — esto garantiza que los
+    // emojis (que van en el htmlBody) y cualquier caracter Unicode del
+    // subject se transmitan correctamente al destinatario.
+    GmailApp.sendEmail(recipient, subject, msg, { htmlBody: html, noReply: true });
+    console.log('OK Reporte diario enviado a ' + recipient);
   } catch(ex) {
-    console.error('❌ Error al enviar reporte diario: ' + ex.message);
+    console.error('ERROR al enviar reporte diario: ' + ex.message);
   }
 }
 
@@ -1103,7 +1115,7 @@ function setupDailyReportTrigger() {
     .nearMinute(0)
     .create();
 
-  console.log('✅ Trigger de reporte diario instalado: se ejecutará cada día a las 12:00 p.m.');
+  console.log('OK Trigger de reporte diario instalado: se ejecutara cada dia a las 12:00 p.m.');
 }
 
 /**
@@ -1120,8 +1132,8 @@ function removeDailyReportTrigger() {
     }
   });
   console.log(removed > 0
-    ? '✅ Trigger de reporte diario eliminado'
-    : 'No se encontró el trigger del reporte diario');
+    ? 'OK Trigger de reporte diario eliminado'
+    : 'No se encontro el trigger del reporte diario');
 }
 
 /* ══════════════════════════════════════════════════════════════
