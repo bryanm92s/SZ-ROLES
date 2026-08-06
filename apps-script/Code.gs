@@ -1,7 +1,7 @@
 // ╔══════════════════════════════════════════════════════════════╗
-// ║  Salome Zuluaga | Micropigmentación — Apps Script v8          ║
-// ║  + Roles (Administradora / Empleada)                          ║
-// ║  + Reportes por usuario                                       ║
+// ║  Salome Zuluaga | SZ-ROLES                                   ║
+// ║  + Roles (Administradora / Empleada)                         ║
+// ║  + Reportes por usuario                                      ║
 // ╚══════════════════════════════════════════════════════════════╝
 
 const SECRET_TOKEN = 'CAMBIA_TU_TOKEN';
