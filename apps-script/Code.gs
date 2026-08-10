@@ -923,13 +923,17 @@ function removeWeeklyEmailTrigger() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   REPORTE DIARIO POR CORREO (12:00 p.m. hora Colombia)
-   Envía a la administradora el MISMO mensaje que se arma con el
-   botón "💬 WhatsApp admin" de la pestaña Reportes (modo Mes),
-   completo con emojis. Solo aplica al mes en curso.
-   - Ejecutar setupDailyReportTrigger() UNA sola vez desde Apps Script
-     para instalar el trigger diario a las 12 del mediodía.
-   - Ejecutar removeDailyReportTrigger() para desactivarlo cuando se quiera.
+   REPORTES AUTOMÁTICOS POR CORREO (12:00 p.m. hora Colombia)
+   - DIARIO  : todos los días, solo citas/gastos de HOY.
+   - SEMANAL : cada domingo, abarca Lun-Dom ISO de la semana en curso.
+   - MENSUAL : último día del mes, abarca el mes completo en curso.
+   Cada envío replica el cuerpo del botón "WhatsApp admin" del frontend,
+   con emojis (via String.fromCharCode para plain text + entities hex
+   &#xNNNNN; para htmlBody, immune a charset). Si el día no tuvo
+   actividad, se envía igual con todo en 0 y la línea
+   "(sin actividad en este período)".
+   - setupAllReportTriggers()  : instala los 3 (idempotente). Ejecutar 1 vez.
+   - removeAllReportTriggers() : los elimina.
 ══════════════════════════════════════════════════════════════ */
 function _dailyReportFmtMonto(n) {
   n = Number(n) || 0;
@@ -943,197 +947,362 @@ function _dailyReportMonthLabel(ym) {
   return NAMES[Number(parts[1]) - 1] + ' ' + parts[0];
 }
 
+// ── Helpers de período (réplica del ReportsTab.jsx, líneas 198-205) ──
+// cleanDate permissive: acepta 'YYYY-MM-DD' literal o cualquier string parseable
+// por new Date(). Devuelve '' si no se puede normalizar.
+function _cleanDate(raw) {
+  if(!raw) return '';
+  var s = String(raw).trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  try {
+    var d = new Date(s);
+    if(isNaN(d.getTime())) return '';
+    var p = function(n){ return String(n).padStart(2,'0') };
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+  } catch(_) { return ''; }
+}
+
+// period = {type:'day'|'week'|'month', day?, from?, to?, ym?}
+// 'week' se trata como range from..to (Lun-Dom ISO). Misma semántica que
+// ReportsTab.jsx inPeriod (líneas 198-205).
+function _inPeriod(d, period) {
+  var x = _cleanDate(d); if(!x) return false;
+  if (period.type === 'day')   return x === period.day;
+  if (period.type === 'month') return x.slice(0,7) === period.ym;
+  // week (range Lun-Dom ISO)
+  return x >= period.from && x <= period.to;
+}
+
+// Devuelve {from, to} del Lun-Dom ISO de la semana que contiene dateStr.
+// dow: 0=Dom ... 6=Sab. Lunes de esa semana = hoy - ((dow + 6) % 7).
+function _weekRange(dateStr) {
+  var d = new Date(dateStr + 'T00:00:00');
+  var dow = d.getDay();
+  var monday = new Date(d);
+  monday.setDate(d.getDate() - ((dow + 6) % 7));
+  var sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  var p = function(n){ return String(n).padStart(2,'0') };
+  return {
+    from: monday.getFullYear()+'-'+p(monday.getMonth()+1)+'-'+p(monday.getDate()),
+    to:   sunday.getFullYear()+'-'+p(sunday.getMonth()+1)+'-'+p(sunday.getDate())
+  };
+}
+
+// Devuelve 'YYYY-MM-DD' del último día del mes m (1-12) del año y.
+function _lastDayOfMonth(y, m) {
+  var d = new Date(y, m, 0);  // día 0 del mes siguiente = último día de m
+  var p = function(n){ return String(n).padStart(2,'0') };
+  return y + '-' + p(m) + '-' + p(d.getDate());
+}
+
+// 'YYYY-MM-DD' → 'vie, 14 ago 2026' (es-CO via Utilities.formatDate).
+// Apps Script v8 no tiene Intl.DateTimeFormat; usamos el tz del script
+// (configurado como America/Bogota).
+function _fmtDayLabel(dateStr) {
+  return Utilities.formatDate(
+    new Date(dateStr + 'T00:00:00'),
+    Session.getScriptTimeZone(),
+    "EEE, d 'de' MMM yyyy"
+  );
+}
+
+// 'YYYY-MM-DD','YYYY-MM-DD' → 'Lun 10 a Dom 16 ago 2026'
+function _fmtRangeLabel(from, to) {
+  var f = _fmtDayLabel(from), t = _fmtDayLabel(to);
+  return f + ' a ' + t;
+}
+
+// ── _buildReport(period) → userList + totales + label ────────────────
+// Período: {type:'day'|'week'|'month', day?, from?, to?, ym?}
+// label: para el 📅 del cuerpo del mensaje y el subject.
+function _buildReport(period) {
+  var ss   = SpreadsheetApp.getActiveSpreadsheet();
+  var tz   = Session.getScriptTimeZone();
+  var now  = new Date();
+  var appts = readSheet(ss, 'appointments');
+  var exps  = readSheet(ss, 'expenses');
+  var users = readPublicUsers(ss);
+
+  // Cargo handlers locales (mismos que tenía el sendDailyReportEmail original)
+  var toN = function(v){ var n = Number(String(v).replace(/[^0-9.-]/g, '')); return isNaN(n) ? 0 : n; };
+  var boolV = function(v){ return v === true || v === 'true'; };
+
+  // Agregados por usuario (idéntico al frontend ReportsTab.jsx)
+  var userList = (users || []).map(function(u){
+    var email = String(u.email||'').trim().toLowerCase();
+    var citasCreadasArr = (appts || []).filter(function(a){
+      return String(a.createdBy||'').trim().toLowerCase() === email && _inPeriod(a.date, period);
+    });
+    var citasAtendidasArr = (appts || []).filter(function(a){
+      return String(a.assignedTo||'').trim().toLowerCase() === email
+        && _inPeriod(a.date, period) && (a.completed === true || a.completed === 'true');
+    });
+    var domAtendidasArr = citasAtendidasArr.filter(function(a){ return boolV(a.domicilio); });
+    var ingresos = citasAtendidasArr
+      .filter(function(a){ return a.completed === true || a.completed === 'true'; })
+      .reduce(function(s,a){ return s + toN(a.totalPrice || a.servicePrice || 0); }, 0);
+    var gastosDelPeriodo = (exps || []).filter(function(e){
+      return String(e.createdBy||'').trim().toLowerCase() === email && _inPeriod(e.date, period);
+    });
+    var montoGastos = gastosDelPeriodo.reduce(function(s,e){ return s + toN(e.amount||0); }, 0);
+    return {
+      email: u.email,
+      name: u.name || '',
+      citasCreadas: citasCreadasArr.length,
+      citasAtendidas: citasAtendidasArr.length,
+      ingresos: ingresos,
+      domAtendidas: domAtendidasArr.length,
+      domAtendidasMonto: domAtendidasArr.reduce(function(s,a){ return s + toN(a.domicilioPrice||0); }, 0),
+      gastos: gastosDelPeriodo.length,
+      montoGastos: montoGastos
+    };
+  });
+
+  // Solo activos en el período (igual que el frontend)
+  userList = userList.filter(function(u){
+    return u.citasCreadas > 0 || u.citasAtendidas > 0 || u.gastos > 0 || u.ingresos > 0;
+  });
+
+  // Totales
+  var totCreadas  = userList.reduce(function(s,u){ return s + u.citasCreadas;  }, 0);
+  var totAtendidas= userList.reduce(function(s,u){ return s + u.citasAtendidas;}, 0);
+  var totMonto    = userList.reduce(function(s,u){ return s + u.montoGastos;  }, 0);
+  var totIngresos = userList.reduce(function(s,u){ return s + u.ingresos;     }, 0);
+  var totDom      = userList.reduce(function(s,u){ return s + u.domAtendidas; }, 0);
+  var totDomMonto = userList.reduce(function(s,u){ return s + u.domAtendidasMonto; }, 0);
+
+  // label según tipo de período (se usa bajo emoji 📅 y en el subject)
+  var label;
+  if (period.type === 'day')        label = _fmtDayLabel(period.day);
+  else if (period.type === 'week')  label = _fmtRangeLabel(period.from, period.to);
+  else                              label = _dailyReportMonthLabel(period.ym);
+
+  return {
+    userList: userList,
+    totales: {
+      creadas: totCreadas, atendidas: totAtendidas,
+      montoGastos: totMonto, ingresos: totIngresos,
+      dom: totDom, domMonto: totDomMonto
+    },
+    label: label
+  };
+}
+
+/*
+ * Núcleo compartido por los 3 senders (daily / weekly / monthly).
+ * Recibe period + kind ('DIARIO'|'SEMANAL'|'MENSUAL') y envía el correo
+ * con el cuerpo idéntico al botón sendWA del frontend (versión del período
+ * elegido). Si userList está vacío (día sin actividad), igual se envía con
+ * todo en 0 y la línea "(sin actividad en este período)" (decisión del user).
+ */
+function _sendReportEmail(period, kind) {
+  var tz   = Session.getScriptTimeZone();
+  var now  = new Date();
+  var recipient = getAdminEmail() || 'bryanmorales8240@gmail.com';
+
+  initSheets(SpreadsheetApp.getActiveSpreadsheet());
+  var r = _buildReport(period);
+  var userList = r.userList;
+  var T = r.totales;
+  var label = r.label;
+
+  // ── Emojis (plain text) — surrogate pairs via String.fromCharCode
+  var SPARK  = String.fromCharCode(0x2728);                 // ✨
+  var CAL    = String.fromCharCode(0xD83D, 0xDCC5);          // 📅
+  var CHART  = String.fromCharCode(0xD83D, 0xDCCA);          // 📊
+  var PEOPLE = String.fromCharCode(0xD83D, 0xDC65);          // 👥
+  var MOTO   = String.fromCharCode(0xD83D, 0xDEF5);          // 🛵
+  var BULLET = String.fromCharCode(0x2022);                  // •
+  var ELLIPSIS = String.fromCharCode(0x2026);              // …
+
+  // ── Emojis (HTML hex entities) — para el htmlBody (immune al charset)
+  var hSPARK = '&#x2728;', hCAL = '&#x1F4C5;', hCHART = '&#x1F4CA;',
+      hPEOPLE = '&#x1F465;', hMOTO = '&#x1F6F5;', hBULLET = '&#x2022;';
+
+  // ── Predicado: si userList está vacío, mostramos "(sin actividad...)"
+  var sorted = userList.slice().sort(function(a,b){
+    return (b.citasAtendidas + b.ingresos) - (a.citasAtendidas + a.ingresos);
+  }).slice(0, 8);
+
+  // ── PLAIN TEXT ───────────────────────────────────────
+  var lines = [];
+  lines.push(SPARK + ' *Reporte de actividad del equipo*');
+  lines.push(CAL + ' ' + label);
+  lines.push('');
+  lines.push(CHART + ' *Totales*');
+  lines.push(BULLET + ' Citas creadas: *' + T.creadas + '*');
+  lines.push(BULLET + ' Citas atendidas: *' + T.atendidas + '*');
+  lines.push(BULLET + ' Ingresos (incl. domicilios): *' + _dailyReportFmtMonto(T.ingresos) + '*');
+  lines.push(BULLET + ' Gastos: *' + _dailyReportFmtMonto(T.montoGastos) + '*');
+  lines.push(BULLET + ' Neto: *' + _dailyReportFmtMonto(T.ingresos - T.montoGastos) + '*');
+  lines.push(BULLET + ' Domicilios: *' + T.dom + '* (' + _dailyReportFmtMonto(T.domMonto) + ' incl. en ingresos)');
+  lines.push('', PEOPLE + ' *Por persona*');
+  if (userList.length === 0) {
+    lines.push('(' + 'sin actividad en este per\u00edodo' + ')');
+  } else {
+    sorted.forEach(function(u){
+      var quien = u.name || u.email.split('@')[0];
+      var domTxt = u.domAtendidas > 0
+        ? ' \u00b7 ' + MOTO + ' ' + u.domAtendidas + ' domicilios (' + _dailyReportFmtMonto(u.domAtendidasMonto) + ' incl.)'
+        : '';
+      lines.push(BULLET + ' ' + quien + ': ' + u.citasCreadas + ' creadas \u00b7 ' + u.citasAtendidas +
+                 ' atendidas \u00b7 ' + _dailyReportFmtMonto(u.ingresos) + ' \u00b7 gastos ' +
+                 _dailyReportFmtMonto(u.montoGastos) + domTxt);
+    });
+    if (userList.length > 8) {
+      lines.push('   ' + ELLIPSIS + 'y ' + (userList.length - 8) + ' m\u00e1s');
+    }
+  }
+  lines.push('', '_Generado ' + Utilities.formatDate(now, tz, "yyyy-MM-dd HH:mm:ss") + '_');
+
+  var msg = lines.join('\n');
+  var stamp = Utilities.formatDate(now, tz, "yyyy-MM-dd HH:mm");
+  var subject = '[REPORTE ' + kind + '] Actividad del equipo - ' + label + ' (' + stamp + ')';
+
+  // ── HTML entity escape (concat-built entities to dodge editor normalization)
+  var AMP = '&' + 'amp;', LT = '&' + 'lt;', GT = '&' + 'gt;';
+  function esc(s){ return String(s)
+    .replace(/&/g, AMP).replace(/</g, LT).replace(/>/g, GT);
+  }
+
+  // ── HTML BODY ───────────────────────────────────────
+  var hlines = [];
+  hlines.push(hSPARK + ' <b>Reporte de actividad del equipo</b>');
+  hlines.push(hCAL + ' ' + esc(label));
+  hlines.push('');
+  hlines.push(hCHART + ' <b>Totales</b>');
+  hlines.push(hBULLET + ' Citas creadas: <b>' + T.creadas + '</b>');
+  hlines.push(hBULLET + ' Citas atendidas: <b>' + T.atendidas + '</b>');
+  hlines.push(hBULLET + ' Ingresos (incl. domicilios): <b>' + esc(_dailyReportFmtMonto(T.ingresos)) + '</b>');
+  hlines.push(hBULLET + ' Gastos: <b>' + esc(_dailyReportFmtMonto(T.montoGastos)) + '</b>');
+  hlines.push(hBULLET + ' Neto: <b>' + esc(_dailyReportFmtMonto(T.ingresos - T.montoGastos)) + '</b>');
+  hlines.push(hBULLET + ' Domicilios: <b>' + T.dom + '</b> (' + esc(_dailyReportFmtMonto(T.domMonto)) + ' incl. en ingresos)');
+  hlines.push('', hPEOPLE + ' <b>Por persona</b>');
+  if (userList.length === 0) {
+    hlines.push('<i>(sin actividad en este per&#x00ed;odo)</i>');
+  } else {
+    sorted.forEach(function(u){
+      var quien = esc(u.name || u.email.split('@')[0]);
+      var domTxt = u.domAtendidas > 0
+        ? ' \u00b7 ' + hMOTO + ' ' + u.domAtendidas + ' domicilios (' + esc(_dailyReportFmtMonto(u.domAtendidasMonto)) + ' incl.)'
+        : '';
+      hlines.push(hBULLET + ' ' + quien + ': ' + u.citasCreadas + ' creadas \u00b7 ' + u.citasAtendidas +
+                  ' atendidas \u00b7 ' + esc(_dailyReportFmtMonto(u.ingresos)) + ' \u00b7 gastos ' +
+                  esc(_dailyReportFmtMonto(u.montoGastos)) + domTxt);
+    });
+    if (userList.length > 8) {
+      hlines.push('   &#x2026;y ' + (userList.length - 8) + ' m&#x00e1;s');
+    }
+  }
+  hlines.push('', '<i>Generado ' + Utilities.formatDate(now, tz, "yyyy-MM-dd HH:mm:ss") + '</i>');
+
+  var htmlBody =
+    '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' +
+    '<div style="font-family:monospace;white-space:pre-wrap;line-height:1.5;color:#222;background:#fff;padding:8px">' +
+    hlines.join('\n').replace(/\n/g, '<br>') +
+    '</div>' +
+    '<br><br><small style="color:#888">Reporte autom\u00e1tico ' + kind.toLowerCase() +
+    ' \u2014 12:00 p.m. (hora Colombia). Activa/desactiva con ' +
+    '<code>setupAllReportTriggers()</code> / <code>removeAllReportTriggers()</code>.</small>' +
+    '</body></html>';
+
+  GmailApp.sendEmail(recipient, subject, msg, { htmlBody: htmlBody, noReply: true });
+  console.log('OK Reporte ' + kind + ' enviado a ' + recipient);
+}
+
+/**
+ * REPORTE DIARIO (todos los días a las 12 p.m.) — solo citas/gastos de HOY.
+ * Si hoy no hubo actividad, se envía igual con todo en 0.
+ */
 function sendDailyReportEmail() {
   try {
-    var ss   = SpreadsheetApp.getActiveSpreadsheet();
-    var tz   = Session.getScriptTimeZone();
-    var now  = new Date();
-    var ym   = Utilities.formatDate(now, tz, 'yyyy-MM');
-    var recipient = getAdminEmail() || 'bryanmorales8240@gmail.com';
-
-    initSheets(ss);
-    var appts   = readSheet(ss, 'appointments');
-    var exps    = readSheet(ss, 'expenses');
-    var users   = readPublicUsers(ss);
-
-    // ── Helpers locales (réplica del ReportsTab.jsx) ─────────
-    var toN = function(v){ var n = Number(String(v).replace(/[^0-9.-]/g, '')); return isNaN(n) ? 0 : n; };
-    var boolV = function(v){ return v === true || v === 'true'; };
-    var cleanDate = function(raw){
-      if(!raw) return '';
-      var s = String(raw).trim();
-      if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-      try {
-        var d = new Date(s);
-        if(isNaN(d.getTime())) return '';
-        var y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), dd = String(d.getDate()).padStart(2,'0');
-        return y+'-'+m+'-'+dd;
-      } catch(_) { return ''; }
-    };
-    var inPeriod = function(d){
-      var x = cleanDate(d);
-      if(!x) return false;
-      return x.slice(0,7) === ym;
-    };
-
-    // ── Aggregate per-user (mismo criterio que el frontend) ──
-    var userList = (users || []).map(function(u){
-      var email = String(u.email||'').trim().toLowerCase();
-
-      var citasCreadasArr = (appts || []).filter(function(a){
-        return String(a.createdBy||'').trim().toLowerCase() === email && inPeriod(a.date);
-      });
-      var citasAtendidasArr = (appts || []).filter(function(a){
-        return String(a.assignedTo||'').trim().toLowerCase() === email
-          && inPeriod(a.date) && (a.completed === true || a.completed === 'true');
-      });
-      var domAtendidasArr = citasAtendidasArr.filter(function(a){ return boolV(a.domicilio); });
-      var ingresos = citasAtendidasArr
-        .filter(function(a){ return a.completed === true || a.completed === 'true'; })
-        .reduce(function(s,a){ return s + toN(a.totalPrice || a.servicePrice || 0); }, 0);
-      var gastosDelPeriodo = (exps || []).filter(function(e){
-        return String(e.createdBy||'').trim().toLowerCase() === email && inPeriod(e.date);
-      });
-      var montoGastos = gastosDelPeriodo.reduce(function(s,e){ return s + toN(e.amount||0); }, 0);
-
-      return {
-        email: u.email,
-        name: u.name || '',
-        citasCreadas: citasCreadasArr.length,
-        citasAtendidas: citasAtendidasArr.length,
-        ingresos: ingresos,
-        domAtendidas: domAtendidasArr.length,
-        domAtendidasMonto: domAtendidasArr.reduce(function(s,a){ return s + toN(a.domicilioPrice||0); }, 0),
-        gastos: gastosDelPeriodo.length,
-        montoGastos: montoGastos
-      };
-    });
-
-    // Solo activos en el período (igual que el frontend)
-    userList = userList.filter(function(u){
-      return u.citasCreadas > 0 || u.citasAtendidas > 0 || u.gastos > 0 || u.ingresos > 0;
-    });
-
-    // ── Totales ─────────────────────────────────────────────
-    var totCreadas  = userList.reduce(function(s,u){ return s + u.citasCreadas;  }, 0);
-    var totAtendidas= userList.reduce(function(s,u){ return s + u.citasAtendidas;}, 0);
-    var totMonto    = userList.reduce(function(s,u){ return s + u.montoGastos;  }, 0);
-    var totIngresos = userList.reduce(function(s,u){ return s + u.ingresos;     }, 0);
-    var totDom      = userList.reduce(function(s,u){ return s + u.domAtendidas; }, 0);
-    var totDomMonto = userList.reduce(function(s,u){ return s + u.domAtendidasMonto; }, 0);
-
-    // ── Construir mensaje (réplica de sendWA de ReportsTab.jsx) ──
-    // Los emojis se construyen con String.fromCharCode + surrogate pairs
-    // (high surrogate 0xD800-0xDBFF, low surrogate 0xDC00-0xDFFF) en lugar
-    // de '\uXXXX' escapes. Esto evita que el editor/persistencia de Apps
-    // Script corrompa los caracteres por encoding — el string siempre se
-    // arma a runtime desde enteros, no desde bytes del archivo fuente.
-    var SPARK  = String.fromCharCode(0x2728);                                    // ✨
-    var CAL    = String.fromCharCode(0xD83D, 0xDCC5);                            // 📅
-    var CHART  = String.fromCharCode(0xD83D, 0xDCCA);                            // 📊
-    var PEOPLE = String.fromCharCode(0xD83D, 0xDC65);                            // 👥
-    var MOTO   = String.fromCharCode(0xD83D, 0xDEF5);                            // 🛵
-
-    var lines = [];
-    lines.push(SPARK + ' *Reporte de actividad del equipo*');
-    lines.push(CAL + ' ' + _dailyReportMonthLabel(ym));
-    lines.push('');
-    lines.push(CHART + ' *Totales*');
-    lines.push('• Citas creadas: *' + totCreadas + '*');
-    lines.push('• Citas atendidas: *' + totAtendidas + '*');
-    lines.push('• Ingresos (incl. domicilios): *' + _dailyReportFmtMonto(totIngresos) + '*');
-    lines.push('• Gastos: *' + _dailyReportFmtMonto(totMonto) + '*');
-    lines.push('• Neto: *' + _dailyReportFmtMonto(totIngresos - totMonto) + '*');
-    lines.push('• Domicilios: *' + totDom + '* (' + _dailyReportFmtMonto(totDomMonto) + ' incl. en ingresos)');
-
-    if (userList.length > 0) {
-      lines.push('', PEOPLE + ' *Por persona*');
-      var sorted = userList.slice().sort(function(a,b){
-        return (b.citasAtendidas + b.ingresos) - (a.citasAtendidas + a.ingresos);
-      }).slice(0, 8);
-      sorted.forEach(function(u){
-        var quien = u.name || u.email.split('@')[0];
-        var domTxt = u.domAtendidas > 0
-          ? ' · ' + MOTO + ' ' + u.domAtendidas + ' domicilios (' + _dailyReportFmtMonto(u.domAtendidasMonto) + ' incl.)'
-          : '';
-        lines.push('• ' + quien + ': ' + u.citasCreadas + ' creadas · ' + u.citasAtendidas +
-                   ' atendidas · ' + _dailyReportFmtMonto(u.ingresos) + ' · gastos ' +
-                   _dailyReportFmtMonto(u.montoGastos) + domTxt);
-      });
-      if (userList.length > 8) {
-        var ELLIPSIS = String.fromCharCode(0x2026);
-        lines.push('   ' + ELLIPSIS + 'y ' + (userList.length - 8) + ' más');
-      }
-    }
-    lines.push('', '_Generado ' + Utilities.formatDate(now, tz, "yyyy-MM-dd HH:mm:ss") + '_');
-
-    var msg    = lines.join('\n');
-    var stamp  = Utilities.formatDate(now, tz, "yyyy-MM-dd HH:mm");
-    var subject = '[REPORTE DIARIO] Actividad del equipo — ' + _dailyReportMonthLabel(ym) + ' (' + stamp + ')';
-
-    // Escape HTML de msg (en orden: & primero para no doble-escapar).
-    // Se construyen las entidades con concatenacion de strings para evitar
-    // que el editor normalice visualmente &/</> a sus caracteres.
-    var AMP = '&' + 'amp;',
-        LT  = '&' + 'lt;',
-        GT  = '&' + 'gt;';
-    var html = '<div style="font-family:monospace;white-space:pre-wrap;line-height:1.5">'
-             + msg.replace(/&/g, AMP).replace(/</g, LT).replace(/>/g, GT).replace(/\n/g,'<br>')
-             + '</div>'
-             + '<br><br><small style="color:#888">Reporte automático diario — 12:00 p.m. (hora Colombia). '
-             + 'Puedes activarlo/desactivarlo desde Apps Script con '
-             + '<code>setupDailyReportTrigger()</code> / <code>removeDailyReportTrigger()</code>.</small>';
-
-    // Forzar charset UTF-8 en el cuerpo plano (4º argumento). Apps Script
-    // suele enviar en latin-1 si no se especifica — esto garantiza que los
-    // emojis (que van en el htmlBody) y cualquier caracter Unicode del
-    // subject se transmitan correctamente al destinatario.
-    GmailApp.sendEmail(recipient, subject, msg, { htmlBody: html, noReply: true });
-    console.log('OK Reporte diario enviado a ' + recipient);
+    var tz = Session.getScriptTimeZone();
+    var today = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd');
+    _sendReportEmail({ type:'day', day: today }, 'DIARIO');
   } catch(ex) {
     console.error('ERROR al enviar reporte diario: ' + ex.message);
   }
 }
 
 /**
- * Instala el trigger diario a las 12:00 p.m. (hora del script = Colombia).
- * Ejecutar UNA sola vez manualmente desde el editor de Apps Script.
- * Idempotente: si ya existe, lo elimina y lo vuelve a crear (no duplica).
+ * REPORTE SEMANAL (cada domingo a las 12 p.m.) — Lun-Dom ISO de esta semana.
+ * El trigger se dispara solo en domingo (onWeekDay(SUNDAY)); si por cualquier
+ * motivo corre otro día, sale sin enviar (guard de defensive programming).
  */
-function setupDailyReportTrigger() {
-  var triggers = ScriptApp.getProjectTriggers();
-  triggers.forEach(function(t){
-    if (t.getHandlerFunction() === 'sendDailyReportEmail') {
-      ScriptApp.deleteTrigger(t);
+function sendWeeklyReportEmail() {
+  try {
+    var tz = Session.getScriptTimeZone();
+    var now = new Date();
+    // DIA 0 = Domingo. Si hoy NO es domingo, no enviar (debe disparar el trigger dom).
+    if (now.getDay() !== 0) {
+      console.log('SKIP reporte semanal: hoy no es domingo (' + now.getDay() + ')');
+      return;
     }
-  });
-
-  ScriptApp.newTrigger('sendDailyReportEmail')
-    .timeBased()
-    .everyDays(1)
-    .atHour(12)
-    .nearMinute(0)
-    .create();
-
-  console.log('OK Trigger de reporte diario instalado: se ejecutara cada dia a las 12:00 p.m.');
+    var today = Utilities.formatDate(now, tz, 'yyyy-MM-dd');
+    var wr = _weekRange(today);
+    _sendReportEmail({ type:'week', from: wr.from, to: wr.to }, 'SEMANAL');
+  } catch(ex) {
+    console.error('ERROR al enviar reporte semanal: ' + ex.message);
+  }
 }
 
 /**
- * Desactiva el trigger del reporte diario.
- * Ejecutar manualmente cuando se quiera detener.
+ * REPORTE MENSUAL (último día del mes a las 12 p.m.) — mes completo en curso.
+ * Apps Script no tiene trigger "último día del mes"; el trigger dispara
+ * todos los días y esta función sale sin enviar salvo que hoy sea el último
+ * día (guard).
  */
-function removeDailyReportTrigger() {
-  var triggers = ScriptApp.getProjectTriggers();
+function sendMonthlyReportEmail() {
+  try {
+    var tz = Session.getScriptTimeZone();
+    var now = new Date();
+    var y = now.getFullYear(), m = now.getMonth() + 1;  // m = 1..12
+    var lastDay = _lastDayOfMonth(y, m);  // 'YYYY-MM-DD'
+    var today = Utilities.formatDate(now, tz, 'yyyy-MM-dd');
+    if (today !== lastDay) {
+      console.log('SKIP reporte mensual: hoy (' + today + ') no es fin de mes (' + lastDay + ')');
+      return;
+    }
+    var ym = Utilities.formatDate(now, tz, 'yyyy-MM');
+    _sendReportEmail({ type:'month', ym: ym }, 'MENSUAL');
+  } catch(ex) {
+    console.error('ERROR al enviar reporte mensual: ' + ex.message);
+  }
+}
+
+/**
+ * Instala los 3 triggers: diario (everyDays 12:00), semanal (domingo 12:00),
+ * mensual (everyDays 12:00 + guard de fin-de-mes). Idempotente: primero
+ * elimina cualquier trigger previo de los 3 para no duplicar.
+ * Ejecutar UNA sola vez manualmente desde Apps Script.
+ */
+function setupAllReportTriggers() {
+  removeAllReportTriggers();
+  ScriptApp.newTrigger('sendDailyReportEmail')
+    .timeBased().everyDays(1).atHour(12).nearMinute(0).create();
+  ScriptApp.newTrigger('sendWeeklyReportEmail')
+    .timeBased().onWeekDay(ScriptApp.WeekDay.SUNDAY).atHour(12).nearMinute(0).create();
+  ScriptApp.newTrigger('sendMonthlyReportEmail')
+    .timeBased().everyDays(1).atHour(12).nearMinute(0).create();
+  console.log('OK 3 triggers (daily / weekly-sun / monthly-lastDay) a las 12:00 p.m.');
+}
+
+/**
+ * Elimina los 3 triggers de reporte (o los que existan). Idempotente.
+ */
+function removeAllReportTriggers() {
+  var names = ['sendDailyReportEmail','sendWeeklyReportEmail','sendMonthlyReportEmail'];
   var removed = 0;
-  triggers.forEach(function(t){
-    if (t.getHandlerFunction() === 'sendDailyReportEmail') {
+  ScriptApp.getProjectTriggers().forEach(function(t){
+    if (names.indexOf(t.getHandlerFunction()) >= 0) {
       ScriptApp.deleteTrigger(t);
       removed++;
     }
   });
   console.log(removed > 0
-    ? 'OK Trigger de reporte diario eliminado'
-    : 'No se encontro el trigger del reporte diario');
+    ? 'OK ' + removed + ' trigger(s) de reporte eliminados'
+    : 'No hab\u00eda triggers de reporte');
 }
 
 /* ══════════════════════════════════════════════════════════════
