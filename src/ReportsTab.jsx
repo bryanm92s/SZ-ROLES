@@ -183,7 +183,7 @@ function UserCard({ user, color, isCurrentUser, onGoCitas, onGoGastos, netLabelW
 ══════════════════════════════════════════════════════════════ */
 export default function ReportsTab({ userEmail, userRole, sync, expenses, clients, appts, SE, setTab, users: allUsers }) {
   // Modo de período: 'month' (mes del dropdown) | 'day' (un día puntual) | 'range' (rango desde–hasta)
-  const [periodMode, setPeriodMode] = useState('month')
+  const [periodMode, setPeriodMode] = useState('day')
   const today = localDateStr()
   const [month, setMonth] = useState(today.slice(0,7))
   const [day,  setDay]    = useState(today)
