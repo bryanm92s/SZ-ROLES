@@ -405,9 +405,9 @@ export default function ReportsTab({ userEmail, userRole, sync, expenses, client
             Actividad del equipo
           </div>
 
-          {/* Chips: Mes / Día / Rango */}
+          {/* Chips: Día / Mes / Rango */}
           <div style={{display:'flex',gap:8,marginBottom:12}}>
-            {[['month','🗓️ Mes'],['day','📅 Día'],['range','📆 Rango']].map(([id,lb])=>(
+            {[['day','📅 Día'],['month','🗓️ Mes'],['range','📆 Rango']].map(([id,lb])=>(
               <button key={id} onClick={()=>setPeriodMode(id)}
                 style={{flex:1,background:periodMode===id?P:'white',color:periodMode===id?'white':'var(--t2)',
                   border:`1.5px solid ${periodMode===id?P:'var(--border)'}`,borderRadius:20,
