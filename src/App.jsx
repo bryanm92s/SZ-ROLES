@@ -711,12 +711,16 @@ function NavIcon({type, active}) {
     ),
     cal2: (
       <svg style={s} width="22" height="22" viewBox="0 0 22 22" fill="none">
-        <rect x="2" y="4" width="18" height="16" rx="3" stroke={c} strokeWidth="1.8" fill={active?c:'none'} fillOpacity={active?.12:0}/>
-        <line x1="2" y1="9" x2="20" y2="9" stroke={c} strokeWidth="1.6"/>
+        <rect x="2" y="4" width="18" height="16" rx="3" stroke={c} strokeWidth="1.8" fill="none"/>
+        <line x1="2" y1="8.5" x2="20" y2="8.5" stroke={c} strokeWidth="1.6"/>
         <line x1="7" y1="2" x2="7" y2="6" stroke={c} strokeWidth="2" strokeLinecap="round"/>
         <line x1="15" y1="2" x2="15" y2="6" stroke={c} strokeWidth="2" strokeLinecap="round"/>
-        <rect x="5.5" y="12" width="4" height="3.5" rx="1" fill={c} opacity={active?1:.8}/>
-        <rect x="12.5" y="12" width="4" height="3.5" rx="1" fill={c} opacity={active?1:.5}/>
+        <rect x="5"    y="10.8" width="2.6" height="2.6" rx="0.6" fill={c} opacity={active?1:.5}/>
+        <rect x="9.7"  y="10.8" width="2.6" height="2.6" rx="0.6" fill={c} opacity={active?1:.5}/>
+        <rect x="14.4" y="10.8" width="2.6" height="2.6" rx="0.6" fill={c} opacity={active?1:.5}/>
+        <rect x="5"    y="14.6" width="2.6" height="2.6" rx="0.6" fill={c} opacity={active?1:.5}/>
+        <rect x="9.7"  y="14.6" width="2.6" height="2.6" rx="0.6" fill={active?c:'none'} stroke={c} strokeWidth="1.3"/>
+        <rect x="14.4" y="14.6" width="2.6" height="2.6" rx="0.6" fill={c} opacity={active?1:.5}/>
       </svg>
     ),
     people: (
