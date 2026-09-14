@@ -424,31 +424,33 @@ export default function App() {
       {modal?.type==='confirm' && <Modal msg={modal.msg} onOk={()=>{modal.onOk();setModal(null)}} onCancel={()=>setModal(null)}/>}
       {modal?.type==='info'    && <Modal msg={modal.msg} onOk={()=>setModal(null)} okLabel="Entendido" cancelLabel={null}/>}
 
-      <header style={{background:'var(--grad-header)',padding:'12px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:100,boxShadow:'0 2px 20px rgba(0,0,0,0.15)',flexWrap:'wrap',gap:8}}>
-        <div style={{display:'flex',alignItems:'center',gap:11,minWidth:0,flex:1}}>
-          {BIZ_LOGO
-            ? <img src={BIZ_LOGO} alt={BIZ_NAME} style={{width:36,height:36,borderRadius:10,objectFit:'cover',flexShrink:0}}/>
-            : <div style={{fontSize:24}}>{BIZ_EMOJI}</div>
-          }
-          <div style={{minWidth:0}}>
-            <div style={{fontFamily:'Georgia,serif',fontSize:14,color:'white',fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{BIZ_NAME}</div>
-            <div style={{fontSize:8,color:'rgba(255,255,255,0.85)',letterSpacing:'0.14em',textTransform:'uppercase',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{BIZ_SUBTITLE}</div>
+      <header style={{background:'var(--grad-header)',position:'sticky',top:0,zIndex:100,boxShadow:'0 2px 20px rgba(0,0,0,0.15)'}}>
+        <div className="header-inner" style={{padding:'12px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
+          <div style={{display:'flex',alignItems:'center',gap:10,minWidth:0,flex:1}}>
+            {BIZ_LOGO
+              ? <img src={BIZ_LOGO} alt={BIZ_NAME} style={{width:36,height:36,borderRadius:10,objectFit:'cover',flexShrink:0}}/>
+              : <div style={{fontSize:24}}>{BIZ_EMOJI}</div>
+            }
+            <div style={{minWidth:0}}>
+              <div style={{fontFamily:'Georgia,serif',fontSize:15,color:'white',fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{BIZ_NAME}</div>
+              <div style={{fontSize:8,color:'rgba(255,255,255,0.85)',letterSpacing:'0.1em',textTransform:'uppercase',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{BIZ_SUBTITLE}</div>
+            </div>
           </div>
-        </div>
-        <div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0}}>
-          <button onClick={()=>refresh(true)} className="btn-sm" style={{padding:'6px 10px',minWidth:'auto'}} aria-label="Actualizar">↻</button>
-          <SyncBadge status={status} lastSync={lastSync}/>
-          <div style={{position:'relative'}}>
-            <button onClick={()=>setUserMenuOpen(v=>!v)} className="btn-sm" style={{padding:'6px 10px',display:'flex',alignItems:'center',gap:4,minWidth:'auto'}} aria-label="Menú de usuario">
-              👤 <span className="user-name" style={{maxWidth:100,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:11}}>{userName || (userEmail||'').split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</span>
-            </button>
-            {userMenuOpen && (
-              <div style={{position:'absolute',right:0,top:'calc(100% + 8px)',background:'var(--card)',borderRadius:12,boxShadow:'0 4px 24px rgba(0,0,0,.15)',padding:'8px',minWidth:180,zIndex:200}} onClick={()=>setUserMenuOpen(false)}>
-                <div style={{fontSize:11,color:'var(--t2)',padding:'4px 10px 8px',borderBottom:'1px solid var(--border)',marginBottom:6}}>{userName && <strong style={{display:'block',color:'var(--t)',fontSize:12}}>{userName}</strong>}{userEmail}</div>
-                <button onClick={()=>setShowChangePw(true)} style={{width:'100%',textAlign:'left',background:'none',border:'none',padding:'9px 12px',fontSize:14,cursor:'pointer',fontFamily:'inherit',borderRadius:8,color:'var(--t)',fontWeight:500}}>🔑 Cambiar contraseña</button>
-                <button onClick={handleLogout} style={{width:'100%',textAlign:'left',background:'none',border:'none',padding:'9px 12px',fontSize:14,cursor:'pointer',fontFamily:'inherit',borderRadius:8,color:'#B85C6E',fontWeight:600}}>🚪 Cerrar sesión</button>
-              </div>
-            )}
+          <div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0,flexWrap:'wrap',justifyContent:'flex-end'}}>
+            <button onClick={()=>refresh(true)} className="btn-sm" style={{padding:'6px 10px',minWidth:'auto'}} aria-label="Actualizar">↻</button>
+            <SyncBadge status={status} lastSync={lastSync}/>
+            <div style={{position:'relative'}}>
+              <button onClick={()=>setUserMenuOpen(v=>!v)} className="btn-sm" style={{padding:'6px 10px',display:'flex',alignItems:'center',gap:4,minWidth:'auto'}} aria-label="Menú de usuario">
+                👤 <span className="user-name" style={{maxWidth:100,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:11}}>{userName || (userEmail||'').split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</span>
+              </button>
+              {userMenuOpen && (
+                <div style={{position:'absolute',right:0,top:'calc(100% + 8px)',background:'var(--card)',borderRadius:12,boxShadow:'0 4px 24px rgba(0,0,0,.15)',padding:'8px',minWidth:180,zIndex:200}} onClick={()=>setUserMenuOpen(false)}>
+                  <div style={{fontSize:11,color:'var(--t2)',padding:'4px 10px 8px',borderBottom:'1px solid var(--border)',marginBottom:6}}>{userName && <strong style={{display:'block',color:'var(--t)',fontSize:12}}>{userName}</strong>}{userEmail}</div>
+                  <button onClick={()=>setShowChangePw(true)} style={{width:'100%',textAlign:'left',background:'none',border:'none',padding:'9px 12px',fontSize:14,cursor:'pointer',fontFamily:'inherit',borderRadius:8,color:'var(--t)',fontWeight:500}}>🔑 Cambiar contraseña</button>
+                  <button onClick={handleLogout} style={{width:'100%',textAlign:'left',background:'none',border:'none',padding:'9px 12px',fontSize:14,cursor:'pointer',fontFamily:'inherit',borderRadius:8,color:'#B85C6E',fontWeight:600}}>🚪 Cerrar sesión</button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -1000,11 +1002,43 @@ function GS() { return <style>{`
     /* Hide username text on very small screens */
     header button span[style*="maxWidth"]{display:none}
     header button::after{content:'👤';font-size:16px}
+    
+    /* HEADER TWO ROWS ON MOBILE */
+    header .header-inner{
+      flex-direction:column !important;
+      align-items:stretch !important;
+      gap:8px !important;
+    }
+    header .header-inner > div:first-child{
+      order:1;
+      justify-content:center;
+      text-align:center;
+    }
+    header .header-inner > div:last-child{
+      order:2;
+      justify-content:center;
+      width:100%;
+    }
   }
   
-  /* Large Mobile / Small Tablet */
-  @media (min-width: 481px) and (max-width: 640px) {
-    header button span[style*="maxWidth"]{max-width:80px !important}
+  /* Tablet - header two rows when needed */
+  @media (min-width: 481px) and (max-width: 768px) {
+    header .header-inner{
+      flex-direction:column;
+      align-items:stretch;
+      gap:8px;
+    }
+    header .header-inner > div:first-child{
+      order:1;
+      justify-content:space-between;
+    }
+    header .header-inner > div:last-child{
+      order:2;
+      justify-content:flex-end;
+      width:100%;
+      padding-top:4px;
+      border-top:1px solid rgba(255,255,255,0.2);
+    }
   }
   
   /* Animations */
