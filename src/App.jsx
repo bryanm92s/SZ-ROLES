@@ -856,19 +856,15 @@ function GS() { return <style>{`
   
   /* Modern Flat Card - ELEVATED */
   .card{background:var(--card);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px;margin-bottom:14px;box-shadow:var(--flat-shadow);transition:box-shadow .2s,transform .2s,border-color .2s;position:relative}
-  .card:hover{box-shadow:var(--flat-shadow-hover);transform:translateY(-2px);border-color:var(--primary)}
   .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad-header);border-radius:var(--radius-lg) var(--radius-lg) 0 0;opacity:0;transition:opacity .2s}
-  .card:hover::before{opacity:1}
   
   /* Neumorphic Card - DEEP EXTRUSION */
   .card-neu{background:var(--bg);border-radius:var(--radius-lg);border:none;padding:18px;margin-bottom:14px;box-shadow:var(--neumorph-shadow);transition:box-shadow .25s}
-  .card-neu:hover{box-shadow:var(--neumorph-shadow-lg)}
   .card-neu:active{box-shadow:var(--neumorph-shadow-inset)}
   .card-neu-inset{background:var(--bg);border-radius:var(--radius-md);border:none;padding:14px;box-shadow:var(--neumorph-shadow-inset)}
   
   /* Glassmorphism Card - FROSTED GLASS */
   .card-glass{background:var(--glass-bg);border-radius:var(--radius-lg);border:1px solid var(--glass-border);padding:18px;margin-bottom:14px;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6);transition:all .25s}
-  .card-glass:hover{box-shadow:0 16px 48px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8);transform:translateY(-2px)}
   
   /* Inputs - NEUMORPHIC INSET */
   .inp{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:16px;color:var(--t);background:white;outline:none;font-family:inherit;transition:all .15s;-webkit-appearance:none;box-shadow:var(--neumorph-shadow-inset);min-height:48px}
@@ -882,35 +878,27 @@ function GS() { return <style>{`
   /* Buttons - Modern Flat Primary - BOLD */
   .btn{background:var(--primary);color:white;border:none;border-radius:var(--radius-md);padding:14px 28px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:0 4px 16px rgba(181,82,74,0.35);min-height:48px;min-width:120px;position:relative;overflow:hidden}
   .btn::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(255,255,255,0.15),transparent);border-radius:inherit;opacity:0;transition:opacity .15s}
-  .btn:hover{background:var(--primary-d);box-shadow:0 6px 20px rgba(181,82,74,0.45);transform:translateY(-2px)}
-  .btn:hover::after{opacity:1}
   .btn:active{background:var(--primary-d);transform:translateY(0);box-shadow:0 2px 8px rgba(181,82,74,0.3)}
   .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 2px 8px rgba(181,82,74,0.2)}
   
   /* Buttons - Outline */
   .btn-o{background:var(--card);color:var(--primary);border:2px solid var(--primary);border-radius:var(--radius-md);padding:12px 20px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;transition:all .15s;min-height:48px}
-  .btn-o:hover{background:var(--primary-l);transform:translateY(-2px);box-shadow:0 4px 16px rgba(181,82,74,0.2)}
   
   /* Buttons - Small/Secondary */
   .btn-sm{background:var(--primary-l);color:var(--primary);border:none;border-radius:var(--radius-sm);padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;min-height:40px}
-  .btn-sm:hover{background:var(--primary);color:white;box-shadow:0 4px 12px rgba(181,82,74,0.3)}
   
   /* Buttons - Delete/Destructive */
   .btn-del{background:var(--primary-l);color:var(--red);border:none;border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;min-height:40px}
-  .btn-del:hover{background:var(--red);color:white;box-shadow:0 4px 12px rgba(176,48,48,0.3)}
   .btn-del:active{background:#8B2020}
   
   /* Buttons - WhatsApp */
   .btn-wa{background:#25D366;color:white;border:none;border-radius:var(--radius-sm);padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:0 4px 16px rgba(37,211,102,0.35);min-height:40px}
-  .btn-wa:hover{background:#1DB956;box-shadow:0 6px 20px rgba(37,211,102,0.45);transform:translateY(-1px)}
   
   /* Buttons - Edit */
   .btn-edit{background:var(--primary-l);color:var(--primary-d);border:none;border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;min-height:40px}
-  .btn-edit:hover{background:var(--primary);color:white;box-shadow:0 4px 12px rgba(181,82,74,0.3)}
   
   /* Buttons - Check/Toggle - NEUMORPHIC */
   .btn-check{background:var(--card);border:2px solid var(--border);color:var(--t2);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:var(--neumorph-shadow-sm);min-height:40px}
-  .btn-check:hover{border-color:var(--primary);color:var(--primary);box-shadow:var(--neumorph-shadow)}
   .btn-check.done{background:var(--primary-l);border-color:var(--green);color:var(--green);box-shadow:0 4px 16px rgba(46,125,82,0.25)}
   
   /* Tags */
@@ -926,18 +914,14 @@ function GS() { return <style>{`
   /* Stats - ELEVATED */
   .stat{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;box-shadow:var(--flat-shadow);position:relative;overflow:hidden}
   .stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad-header);opacity:0;transition:opacity .2s}
-  .stat:hover{transform:translateY(-3px);box-shadow:var(--flat-shadow-hover);border-color:var(--primary)}
-  .stat:hover::before{opacity:1}
   
   /* Time slots - NEUMORPHIC */
   .to{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);padding:10px 4px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;font-family:inherit;transition:all .12s;color:var(--t);line-height:1.2;box-shadow:var(--neumorph-shadow-sm);min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;flex-direction:column}
-  .to:hover:not(:disabled){border-color:var(--primary);color:var(--primary);transform:translateY(-2px);box-shadow:var(--neumorph-shadow)}
   .to.sel{background:var(--primary);border-color:var(--primary);color:white;box-shadow:0 4px 16px rgba(181,82,74,0.4);transform:translateY(-1px)}
   .to:disabled{background:var(--bg);border-color:var(--border);color:var(--t2);cursor:not-allowed;box-shadow:none}
   
   /* Service options - NEUMORPHIC */
   .so{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;cursor:pointer;text-align:left;width:100%;font-family:inherit;transition:all .15s;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--neumorph-shadow-sm)}
-  .so:hover{border-color:var(--primary);background:var(--primary-l);transform:translateY(-2px);box-shadow:var(--neumorph-shadow)}
   .so.sel{border-color:var(--primary);background:var(--primary-l);box-shadow:0 4px 16px rgba(181,82,74,0.3)}
   
   /* Warning box */
@@ -946,7 +930,29 @@ function GS() { return <style>{`
   /* Suggestions */
   .sugg-item{padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);font-size:14px;transition:background .12s}
   .sugg-item:last-child{border-bottom:none}
-  .sugg-item:hover{background:var(--primary-l)}
+  
+  /* Hover-only effects - scoped so tapping on touchscreens (which simulate
+     :hover on tap and then get "stuck" until the user taps elsewhere) never
+     triggers them. Only real pointer devices (mouse/trackpad) get these. */
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover{box-shadow:var(--flat-shadow-hover);transform:translateY(-2px);border-color:var(--primary)}
+    .card:hover::before{opacity:1}
+    .card-neu:hover{box-shadow:var(--neumorph-shadow-lg)}
+    .card-glass:hover{box-shadow:0 16px 48px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8);transform:translateY(-2px)}
+    .btn:hover{background:var(--primary-d);box-shadow:0 6px 20px rgba(181,82,74,0.45);transform:translateY(-2px)}
+    .btn:hover::after{opacity:1}
+    .btn-o:hover{background:var(--primary-l);transform:translateY(-2px);box-shadow:0 4px 16px rgba(181,82,74,0.2)}
+    .btn-sm:hover{background:var(--primary);color:white;box-shadow:0 4px 12px rgba(181,82,74,0.3)}
+    .btn-del:hover{background:var(--red);color:white;box-shadow:0 4px 12px rgba(176,48,48,0.3)}
+    .btn-wa:hover{background:#1DB956;box-shadow:0 6px 20px rgba(37,211,102,0.45);transform:translateY(-1px)}
+    .btn-edit:hover{background:var(--primary);color:white;box-shadow:0 4px 12px rgba(181,82,74,0.3)}
+    .btn-check:hover{border-color:var(--primary);color:var(--primary);box-shadow:var(--neumorph-shadow)}
+    .stat:hover{transform:translateY(-3px);box-shadow:var(--flat-shadow-hover);border-color:var(--primary)}
+    .stat:hover::before{opacity:1}
+    .to:hover:not(:disabled){border-color:var(--primary);color:var(--primary);transform:translateY(-2px);box-shadow:var(--neumorph-shadow)}
+    .so:hover{border-color:var(--primary);background:var(--primary-l);transform:translateY(-2px);box-shadow:var(--neumorph-shadow)}
+    .sugg-item:hover{background:var(--primary-l)}
+  }
   
   /* ========================================
      RESPONSIVE BREAKPOINTS
