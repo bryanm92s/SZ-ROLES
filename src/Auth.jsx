@@ -2,44 +2,44 @@ import { useState } from 'react'
 import { hashPassword, authLogin, authRegister, authRequestReset, authResetPassword } from './api.js'
 
 /* ── palette (matches App.jsx) ── */
-const P  = '#B85C6E'
-const PL = '#FDF6F0'
-const PB = '#F5D0D8'
+const P  = '#B5524A'
+const PD = '#8E3E38'
+const PL = '#FAEAE8'
+const BG = '#F7F0EC'
 
 const inp = {
-  width:'100%', padding:'11px 14px', border:`1.5px solid ${PB}`,
-  borderRadius:10, fontSize:15, fontFamily:'inherit',
+  width:'100%', padding:'12px 14px', border:'1.5px solid var(--border)',
+  borderRadius:'var(--radius-md)', fontSize:15, fontFamily:'inherit',
   background:'white', outline:'none', boxSizing:'border-box',
-  transition:'border .2s',
+  transition:'all .15s', boxShadow:'var(--neumorph-shadow-inset)',
 }
 const btn = {
-  width:'100%', padding:'13px', background:P, color:'white',
-  border:'none', borderRadius:12, fontSize:15, fontWeight:700,
+  width:'100%', padding:'13px', background:'var(--primary)', color:'white',
+  border:'none', borderRadius:'var(--radius-md)', fontSize:15, fontWeight:700,
   cursor:'pointer', fontFamily:'inherit', marginTop:4,
-  transition:'opacity .15s',
+  transition:'all .15s', boxShadow:'0 2px 8px rgba(181,82,74,0.3)',
 }
 const link = {
-  background:'none', border:'none', color:P, fontSize:13,
+  background:'none', border:'none', color:'var(--primary)', fontSize:13,
   cursor:'pointer', fontFamily:'inherit', fontWeight:600,
   textDecoration:'underline', padding:0,
 }
 const card = {
-  background:'white', borderRadius:20, padding:'32px 28px',
-  boxShadow:'0 4px 32px rgba(180,92,110,.13)',
+  background:'var(--card)', borderRadius:'var(--radius-xl)', padding:'32px 28px',
+  boxShadow:'var(--flat-shadow)',
   width:'100%', maxWidth:400, margin:'0 auto',
+  border:'1px solid var(--border)',
 }
 
 function Field({ label, type='text', value, onChange, placeholder }) {
   const [focus, setFocus] = useState(false)
   return (
-    <div style={{marginBottom:14}}>
-      <label style={{fontSize:12,fontWeight:700,color:'#888',textTransform:'uppercase',letterSpacing:'.05em',display:'block',marginBottom:5}}>
-        {label}
-      </label>
+    <div style={{marginBottom:16}}>
+      <label className="lbl" style={{fontSize:11}}>{label}</label>
       <input
         type={type} value={value} onChange={e=>onChange(e.target.value)}
         placeholder={placeholder}
-        style={{...inp, borderColor: focus ? P : PB}}
+        style={{...inp, borderColor: focus ? 'var(--primary)' : 'var(--border)'}}
         onFocus={()=>setFocus(true)} onBlur={()=>setFocus(false)}
       />
     </div>
@@ -48,20 +48,20 @@ function Field({ label, type='text', value, onChange, placeholder }) {
 
 function ErrBox({ msg }) {
   if (!msg) return null
-  return <div style={{background:'#FEE2E2',color:'#B91C1C',borderRadius:10,padding:'10px 14px',fontSize:13,marginBottom:14,fontWeight:500}}>{msg}</div>
+  return <div className="warn-box" style={{background:'#FEE2E2',borderColor:'#FECACA',color:'#B91C1C'}}>{msg}</div>
 }
 
 function OkBox({ msg }) {
   if (!msg) return null
-  return <div style={{background:'#D1FAE5',color:'#065F46',borderRadius:10,padding:'10px 14px',fontSize:13,marginBottom:14,fontWeight:500}}>{msg}</div>
+  return <div className="warn-box" style={{background:'#D1FAE5',borderColor:'#A7F3D0',color:'#065F46'}}>{msg}</div>
 }
 
 function Header({ title, sub }) {
   return (
     <div style={{textAlign:'center',marginBottom:28}}>
-      <div style={{fontSize:40,marginBottom:8}}>🌸</div>
-      <div style={{fontFamily:'Georgia,serif',fontSize:20,fontWeight:700,color:P}}>{title}</div>
-      {sub && <div style={{fontSize:13,color:'#999',marginTop:4}}>{sub}</div>}
+      <div style={{fontSize:44,marginBottom:10}}>🌸</div>
+      <div style={{fontFamily:'Georgia,serif',fontSize:22,fontWeight:700,background:'var(--grad-header)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>{title}</div>
+      {sub && <div style={{fontSize:13,color:'var(--t2)',marginTop:4}}>{sub}</div>}
     </div>
   )
 }
@@ -265,13 +265,13 @@ export default function AuthShell({ children, onLogin, onLogout, userEmail, user
   if (userEmail) return children
 
   const wrap = (
-    <div style={{minHeight:'100vh',background:PL,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'24px 16px'}}>
+    <div style={{minHeight:'100vh',background:'var(--bg)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'24px 16px'}}>
       <div style={{width:'100%',maxWidth:400}}>
         {view === 'login'    && <LoginView    onLogin={onLogin} switchTo={setView} />}
         {view === 'register' && <RegisterView onLogin={onLogin} switchTo={setView} />}
         {view === 'forgot'   && <ForgotView                     switchTo={setView} />}
       </div>
-      <p style={{marginTop:24,fontSize:11,color:'#ccc',textAlign:'center'}}>
+      <p style={{marginTop:24,fontSize:11,color:'var(--t2)',textAlign:'center'}}>
         SZ Micropigmentación © {new Date().getFullYear()}
       </p>
     </div>

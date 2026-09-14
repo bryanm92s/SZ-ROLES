@@ -184,76 +184,98 @@ const BIZ_EMOJI    = import.meta.env.VITE_BIZ_EMOJI    || '🌸'
 const BIZ_LOGO     = import.meta.env.VITE_BIZ_LOGO     || ''
 
 /* ══════════════════════════════════════════════════════════════
-   THEME — PALETTES + DARK MODE
-══════════════════════════════════════════════════════════════ */
+   THEME — PALETTES + GRADIENTS + DESIGN SYSTEM
+   Modern Flat + Neumorphism + Glassmorphism
+═══════════════════════════════════════════════════════════════ */
 const PALETTES = [
   { id:'fucsia',  name:'Fucsia',       emoji:'💗',
     primary:'#C04A82', pd:'#9A2D64', pl:'#FCE8F2',
     bg:'#FDF2F7',   card:'#FFFFFF', border:'#F0C0D8',
-    t:'#2A0A1A',    t2:'#7A2A52' },
+    t:'#2A0A1A',    t2:'#7A2A52',
+    gradHeader:'linear-gradient(135deg, #C04A82 0%, #9A2D64 100%)',
+    gradAccent:'linear-gradient(135deg, #FCE8F2 0%, #F8D0E8 100%)' },
   { id:'rosa',    name:'Rosa Blush',   emoji:'🌸',
     primary:'#B5524A', pd:'#8E3E38', pl:'#FAEAE8',
     bg:'#F7F0EC',   card:'#FFFFFF', border:'#E8D0CC',
-    t:'#1E0E0C',    t2:'#7A5E5A' },
+    t:'#1E0E0C',    t2:'#7A5E5A',
+    gradHeader:'linear-gradient(135deg, #B5524A 0%, #8E3E38 100%)',
+    gradAccent:'linear-gradient(135deg, #FAEAE8 0%, #F5D8D0 100%)' },
   { id:'morado',  name:'Lavanda',      emoji:'💜',
     primary:'#7C5CBF', pd:'#5D3F9E', pl:'#EDE8F9',
     bg:'#F4F0FC',   card:'#FFFFFF', border:'#D8CFF0',
-    t:'#1A0E2E',    t2:'#6B5E8A' },
+    t:'#1A0E2E',    t2:'#6B5E8A',
+    gradHeader:'linear-gradient(135deg, #7C5CBF 0%, #5D3F9E 100%)',
+    gradAccent:'linear-gradient(135deg, #EDE8F9 0%, #E0D8F0 100%)' },
   { id:'azul',    name:'Azul Sereno',  emoji:'💙',
     primary:'#3A6EA8', pd:'#2A5080', pl:'#E3EEF9',
     bg:'#EFF4FB',   card:'#FFFFFF', border:'#C0D4EC',
-    t:'#0E1A2E',    t2:'#4A6080' },
+    t:'#0E1A2E',    t2:'#4A6080',
+    gradHeader:'linear-gradient(135deg, #3A6EA8 0%, #2A5080 100%)',
+    gradAccent:'linear-gradient(135deg, #E3EEF9 0%, #D0E0F0 100%)' },
   { id:'verde',   name:'Salvia',       emoji:'🌿',
     primary:'#4A8C6E', pd:'#316650', pl:'#E2F2EA',
     bg:'#EEF6F1',   card:'#FFFFFF', border:'#BCD9CB',
-    t:'#0E1E16',    t2:'#4A6E5A' },
+    t:'#0E1E16',    t2:'#4A6E5A',
+    gradHeader:'linear-gradient(135deg, #4A8C6E 0%, #316650 100%)',
+    gradAccent:'linear-gradient(135deg, #E2F2EA 0%, #D0E8DC 100%)' },
   { id:'dorado',  name:'Ámbar',        emoji:'✨',
     primary:'#C08A2A', pd:'#966A18', pl:'#FBF2DE',
     bg:'#FBF6EE',   card:'#FFFFFF', border:'#ECCFA0',
-    t:'#2A1A08',    t2:'#7A6030' },
+    t:'#2A1A08',    t2:'#7A6030',
+    gradHeader:'linear-gradient(135deg, #C08A2A 0%, #966A18 100%)',
+    gradAccent:'linear-gradient(135deg, #FBF2DE 0%, #F0E8D0 100%)' },
   { id:'coral',   name:'Coral',        emoji:'🧡',
     primary:'#C2664A', pd:'#A04830', pl:'#FAECEA',
     bg:'#FBF1EE',   card:'#FFFFFF', border:'#ECC8BC',
-    t:'#2A0E08',    t2:'#7A4E40' },
+    t:'#2A0E08',    t2:'#7A4E40',
+    gradHeader:'linear-gradient(135deg, #C2664A 0%, #A04830 100%)',
+    gradAccent:'linear-gradient(135deg, #FAECEA 0%, #F0DDD8 100%)' },
   { id:'teal',    name:'Turquesa',     emoji:'🌊',
     primary:'#2A8A8A', pd:'#1E6A6A', pl:'#DEF2F2',
     bg:'#EEF7F7',   card:'#FFFFFF', border:'#B8DEDE',
-    t:'#0A1E1E',    t2:'#3A6E6E' },
+    t:'#0A1E1E',    t2:'#3A6E6E',
+    gradHeader:'linear-gradient(135deg, #2A8A8A 0%, #1E6A6A 100%)',
+    gradAccent:'linear-gradient(135deg, #DEF2F2 0%, #D0E8E8 100%)' },
   { id:'carbon',  name:'Carbón',       emoji:'🖤',
     primary:'#5A5A7A', pd:'#3E3E5E', pl:'#EAEAF2',
     bg:'#F4F4F8',   card:'#FFFFFF', border:'#CCCCD8',
-    t:'#0E0E18',    t2:'#5A5A6E' },
+    t:'#0E0E18',    t2:'#5A5A6E',
+    gradHeader:'linear-gradient(135deg, #5A5A7A 0%, #3E3E5E 100%)',
+    gradAccent:'linear-gradient(135deg, #EAEAF2 0%, #D8D8E0 100%)' },
 ]
 
-const DARK_VARS = {
-  bg:'#141218', card:'#1E1B24', border:'#2E2A38',
-  t:'#EDE8F6',  t2:'#9490A8',
-}
-
-const THEME_KEY   = 'sz_theme_palette'
-const DARK_KEY    = 'sz_theme_dark'
+const THEME_KEY = 'sz_theme_palette'
 
 function getPalette(id) { return PALETTES.find(p=>p.id===id) || PALETTES[0] }
 
-function ThemeStyle({ paletteId, dark }) {
+function ThemeStyle({ paletteId }) {
   const p = getPalette(paletteId)
-  const bg     = dark ? DARK_VARS.bg     : p.bg
-  const card   = dark ? DARK_VARS.card   : p.card
-  const border = dark ? DARK_VARS.border : p.border
-  const t      = dark ? DARK_VARS.t      : p.t
-  const t2     = dark ? DARK_VARS.t2     : p.t2
-  const inpBg  = dark ? '#2A2638' : 'white'
-  const warnBg = dark ? '#3A3010' : '#FFF4DC'
-  const warnT  = dark ? '#E8D080' : '#7A5000'
   return <style>{`:root{
     --primary:${p.primary};--primary-d:${p.pd};--primary-l:${p.pl};
-    --bg:${bg};--card:${card};--border:${border};
-    --t:${t};--t2:${t2};
-    --inp-bg:${inpBg};
+    --bg:${p.bg};--card:${p.card};--border:${p.border};
+    --t:${p.t};--t2:${p.t2};
+    --grad-header:${p.gradHeader};
+    --grad-accent:${p.gradAccent};
     --gold:#C49A1A;--green:#2E7D52;--red:#B03030;
-    --warn-bg:${warnBg};--warn-t:${warnT};
+    --warn-bg:#FFF4DC;--warn-t:#7A5000;
+    /* Neumorphism shadows */
+    --neumorph-shadow: 8px 8px 16px rgba(0,0,0,0.08), -8px -8px 16px rgba(255,255,255,0.7);
+    --neumorph-shadow-inset: inset 8px 8px 16px rgba(0,0,0,0.08), inset -8px -8px 16px rgba(255,255,255,0.7);
+    --neumorph-shadow-sm: 4px 4px 8px rgba(0,0,0,0.06), -4px -4px 8px rgba(255,255,255,0.7);
+    --neumorph-shadow-lg: 12px 12px 24px rgba(0,0,0,0.1), -12px -12px 24px rgba(255,255,255,0.7);
+    /* Glassmorphism */
+    --glass-bg: rgba(255,255,255,0.65);
+    --glass-border: rgba(255,255,255,0.3);
+    --glass-blur: blur(16px);
+    /* Modern flat */
+    --flat-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    --flat-shadow-hover: 0 4px 16px rgba(0,0,0,0.1);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
   }
-  html { color-scheme: ${dark ? 'dark' : 'light'}; }
+  html { color-scheme: light; }
   `}</style>
 }
 
@@ -277,10 +299,8 @@ export default function App() {
   const [showChangePw, setShowChangePw] = useState(false)
   const [userMenuOpen, setUserMenuOpen]  = useState(false)
   const [paletteId, setPaletteId] = useState(() => localStorage.getItem(THEME_KEY) || 'rosa')
-  const [darkMode,  setDarkMode]  = useState(() => localStorage.getItem(DARK_KEY) === 'true')
 
   const savePalette = id  => { localStorage.setItem(THEME_KEY, id);      setPaletteId(id) }
-  const saveDark    = val => { localStorage.setItem(DARK_KEY,  String(val)); setDarkMode(val) }
 
   const handleLogin  = (email, role='Empleada', name='') => { localStorage.setItem(AUTH_KEY, email); localStorage.setItem(ROLE_KEY, role); localStorage.setItem(NAME_KEY, name); setUserEmail(email); setUserRole(role); setUserName(name) }
   const handleLogout = () => { localStorage.removeItem(AUTH_KEY); localStorage.removeItem(ROLE_KEY); localStorage.removeItem(NAME_KEY); setUserEmail(null); setUserRole('Empleada'); setUserName('') }
@@ -390,7 +410,7 @@ export default function App() {
     a.assignedTo ? a.assignedTo === userEmail : (a.createdBy === userEmail || (!a.assignedTo && !a.createdBy))
   )
 
-  const p = {clients,services,appts,visibleAppts,expenses,visibleExpenses,SC,SS,SA,SE,sync,deleteAppt,setTab,confirm,infoModal,tabExtra,userEmail,userRole,isAdmin,userName,users,userNameMap,paletteId,darkMode,savePalette,saveDark,priceHistory,setPH}
+  const p = {clients,services,appts,visibleAppts,expenses,visibleExpenses,SC,SS,SA,SE,sync,deleteAppt,setTab,confirm,infoModal,tabExtra,userEmail,userRole,isAdmin,userName,users,userNameMap,paletteId,savePalette,priceHistory,setPH}
 
   if (status==='loading') return <Cent><div style={{fontSize:52,animation:'pulse 2s ease-in-out infinite'}}>{BIZ_EMOJI}</div></Cent>
   if (status==='noconfig') return <Cent><div style={{fontSize:36,marginBottom:8}}>⚙️</div><p style={{fontSize:16,fontWeight:600}}>Configura VITE_SCRIPT_URL y VITE_TOKEN en Vercel</p></Cent>
@@ -400,31 +420,31 @@ export default function App() {
       {showChangePw && <ChangePasswordModal email={userEmail} onClose={()=>setShowChangePw(false)}/>}
     <div style={{fontFamily:"'DM Sans',system-ui,sans-serif",minHeight:'100vh',background:'var(--bg)',color:'var(--t)'}}>
       <GS/>
-      <ThemeStyle paletteId={paletteId} dark={darkMode}/>
+      <ThemeStyle paletteId={paletteId}/>
       {modal?.type==='confirm' && <Modal msg={modal.msg} onOk={()=>{modal.onOk();setModal(null)}} onCancel={()=>setModal(null)}/>}
       {modal?.type==='info'    && <Modal msg={modal.msg} onOk={()=>setModal(null)} okLabel="Entendido" cancelLabel={null}/>}
 
-      <header style={{background:'var(--primary)',padding:'13px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:100,boxShadow:'0 2px 12px rgba(180,100,100,0.18)'}}>
+      <header className="glass-header" style={{padding:'13px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:100,boxShadow:'0 2px 20px rgba(0,0,0,0.06)'}}>
         <div style={{display:'flex',alignItems:'center',gap:11}}>
           {BIZ_LOGO
             ? <img src={BIZ_LOGO} alt={BIZ_NAME} style={{width:38,height:38,borderRadius:10,objectFit:'cover',flexShrink:0}}/>
             : <div style={{fontSize:26}}>{BIZ_EMOJI}</div>
           }
           <div>
-            <div style={{fontFamily:'Georgia,serif',fontSize:15,color:'white',fontWeight:700}}>{BIZ_NAME}</div>
-            <div style={{fontSize:9,color:'rgba(255,255,255,0.78)',letterSpacing:'0.14em',textTransform:'uppercase'}}>{BIZ_SUBTITLE}</div>
+            <div style={{fontFamily:'Georgia,serif',fontSize:15,background:'var(--grad-header)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text',fontWeight:700}}>{BIZ_NAME}</div>
+            <div style={{fontSize:9,color:'var(--t2)',letterSpacing:'0.14em',textTransform:'uppercase'}}>{BIZ_SUBTITLE}</div>
           </div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:8}}>
-          <button onClick={()=>refresh(true)} style={{background:'rgba(255,255,255,0.15)',border:'none',borderRadius:20,padding:'5px 10px',color:'white',fontSize:14,cursor:'pointer',fontFamily:'inherit',fontWeight:600}}>↻</button>
+          <button onClick={()=>refresh(true)} className="btn-sm" style={{padding:'6px 12px'}}>↻</button>
           <SyncBadge status={status} lastSync={lastSync}/>
           <div style={{position:'relative'}}>
-            <button onClick={()=>setUserMenuOpen(v=>!v)} style={{background:'rgba(255,255,255,0.18)',border:'none',borderRadius:20,padding:'5px 10px',color:'white',fontSize:13,cursor:'pointer',fontFamily:'inherit',fontWeight:600,display:'flex',alignItems:'center',gap:5}}>
+            <button onClick={()=>setUserMenuOpen(v=>!v)} className="btn-sm" style={{padding:'6px 12px',display:'flex',alignItems:'center',gap:5}}>
               👤 <span style={{maxWidth:100,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:11}}>{userName || (userEmail||'').split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</span>
             </button>
             {userMenuOpen && (
               <div style={{position:'absolute',right:0,top:'calc(100% + 8px)',background:'var(--card)',borderRadius:12,boxShadow:'0 4px 24px rgba(0,0,0,.15)',padding:'8px',minWidth:180,zIndex:200}} onClick={()=>setUserMenuOpen(false)}>
-                <div style={{fontSize:11,color:'var(--t2)',padding:'4px 10px 8px',borderBottom:'1px solid #f0e8e8',marginBottom:6}}>{userName && <strong style={{display:'block',color:'var(--t)',fontSize:12}}>{userName}</strong>}{userEmail}</div>
+                <div style={{fontSize:11,color:'var(--t2)',padding:'4px 10px 8px',borderBottom:'1px solid var(--border)',marginBottom:6}}>{userName && <strong style={{display:'block',color:'var(--t)',fontSize:12}}>{userName}</strong>}{userEmail}</div>
                 <button onClick={()=>setShowChangePw(true)} style={{width:'100%',textAlign:'left',background:'none',border:'none',padding:'9px 12px',fontSize:14,cursor:'pointer',fontFamily:'inherit',borderRadius:8,color:'var(--t)',fontWeight:500}}>🔑 Cambiar contraseña</button>
                 <button onClick={handleLogout} style={{width:'100%',textAlign:'left',background:'none',border:'none',padding:'9px 12px',fontSize:14,cursor:'pointer',fontFamily:'inherit',borderRadius:8,color:'#B85C6E',fontWeight:600}}>🚪 Cerrar sesión</button>
               </div>
@@ -433,7 +453,7 @@ export default function App() {
         </div>
       </header>
 
-      <nav style={{background:'var(--card)',borderBottom:'1px solid var(--border)',display:'flex',overflowX:'auto',padding:'0 2px',position:'sticky',top:58,zIndex:99,scrollbarWidth:'none'}}>
+      <nav style={{background:'var(--card)',borderBottom:'1px solid var(--border)',display:'flex',overflowX:'auto',padding:'0 2px',position:'sticky',top:58,zIndex:99,scrollbarWidth:'none',boxShadow:'0 2px 8px rgba(0,0,0,0.04)'}}>
         {[
           ['dashboard',  'grid',   'Panel',        true],
           ['appointments','cal',   'Citas',         true],
@@ -453,7 +473,7 @@ export default function App() {
         ))}
       </nav>
 
-      <main style={{padding:'16px 14px',maxWidth:680,margin:'0 auto'}}>
+      <main style={{padding:'20px 16px',maxWidth:720,margin:'0 auto'}}>
         {status==='error' && <div className="warn-box">⚠️ Modo sin conexión — {errMsg}</div>}
         {tab==='dashboard'     && <Dashboard      {...p}/>}
         {tab==='appointments'  && <ApptsTab       {...p}/>}
@@ -471,7 +491,7 @@ export default function App() {
         {tab==='my-expenses'     && !isAdmin && <MyExpensesTab {...p}/>}
       </main>
 
-      <footer style={{textAlign:'center',padding:'20px 14px 28px',borderTop:'1px solid var(--border)',marginTop:8,background:'var(--card)'}}>
+      <footer style={{textAlign:'center',padding:'20px 16px 28px',borderTop:'1px solid var(--border)',marginTop:8,background:'rgba(255,255,255,0.8)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)'}}>
         <span style={{fontSize:11,color:'var(--t2)',letterSpacing:'.03em',display:'inline-flex',alignItems:'center',gap:6,flexWrap:'wrap',justifyContent:'center'}}>
           <span>{BIZ_EMOJI} {BIZ_NAME}</span>
           <span style={{color:'var(--border)'}}>|</span>
@@ -785,56 +805,154 @@ function SyncBadge({status,lastSync}) {
 
 /* ── Global CSS ── */
 function GS() { return <style>{`
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap');
   :root{
     --primary:#B5524A;--primary-d:#8E3E38;--primary-l:#FAEAE8;
     --bg:#F7F0EC;--card:#FFFFFF;--border:#E8D0CC;
     --t:#1E0E0C;--t2:#7A5E5A;--gold:#C49A1A;
     --green:#2E7D52;--red:#B03030;
     --warn-bg:#FFF4DC;--warn-t:#7A5000;
+    /* Neumorphism shadows */
+    --neumorph-shadow: 8px 8px 16px rgba(0,0,0,0.08), -8px -8px 16px rgba(255,255,255,0.7);
+    --neumorph-shadow-inset: inset 8px 8px 16px rgba(0,0,0,0.08), inset -8px -8px 16px rgba(255,255,255,0.7);
+    --neumorph-shadow-sm: 4px 4px 8px rgba(0,0,0,0.06), -4px -4px 8px rgba(255,255,255,0.7);
+    --neumorph-shadow-lg: 12px 12px 24px rgba(0,0,0,0.1), -12px -12px 24px rgba(255,255,255,0.7);
+    /* Glassmorphism */
+    --glass-bg: rgba(255,255,255,0.65);
+    --glass-border: rgba(255,255,255,0.3);
+    --glass-blur: blur(16px);
+    /* Modern flat */
+    --flat-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    --flat-shadow-hover: 0 4px 16px rgba(0,0,0,0.1);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{-webkit-tap-highlight-color:transparent}
+  body{-webkit-tap-highlight-color:transparent;background:var(--bg);color:var(--t);font-family:'DM Sans',system-ui,sans-serif}
+  
+  /* Navigation */
   .nb{background:none;border:none;border-bottom:2.5px solid transparent;padding:11px 12px;font-size:13px;font-weight:500;cursor:pointer;color:var(--t2);white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
   .nb.act{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
-  .card{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:18px;margin-bottom:12px}
-  .inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;color:var(--t);background:var(--inp-bg);outline:none;font-family:inherit;transition:border-color .15s;-webkit-appearance:none}
-  .inp:focus{border-color:var(--primary)}
-  .lbl{display:block;font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
-  .btn{background:var(--primary);color:white;border:none;border-radius:10px;padding:12px 22px;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;transition:background .15s}
-  .btn:active{background:var(--primary-d)}.btn:disabled{opacity:.4;cursor:not-allowed}
-  .btn-o{background:var(--card);color:var(--primary);border:1.5px solid var(--primary);border-radius:10px;padding:10px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit}
-  .btn-sm{background:var(--primary-l);color:var(--primary);border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
-  .btn-del{background:var(--primary-l);color:var(--red);border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
-  .btn-del:active{background:var(--red);color:white}
-  .btn-wa{background:#25D366;color:white;border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
-  .btn-edit{background:var(--primary-l);color:var(--primary-d);border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
-  .btn-check{background:var(--card);border:1.5px solid var(--border);color:var(--t2);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
-  .btn-check.done{background:var(--primary-l);border-color:var(--green);color:var(--green)}
+  
+  /* Modern Flat Card */
+  .card{background:var(--card);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px;margin-bottom:12px;box-shadow:var(--flat-shadow);transition:box-shadow .2s,transform .2s}
+  .card:hover{box-shadow:var(--flat-shadow-hover)}
+  
+  /* Neumorphic Card */
+  .card-neu{background:var(--bg);border-radius:var(--radius-lg);border:none;padding:18px;margin-bottom:12px;box-shadow:var(--neumorph-shadow);transition:box-shadow .2s}
+  .card-neu:hover{box-shadow:var(--neumorph-shadow-lg)}
+  .card-neu-inset{background:var(--bg);border-radius:var(--radius-md);border:none;padding:14px;box-shadow:var(--neumorph-shadow-inset)}
+  
+  /* Glassmorphism Card */
+  .card-glass{background:var(--glass-bg);border-radius:var(--radius-lg);border:1px solid var(--glass-border);padding:18px;margin-bottom:12px;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 8px 32px rgba(0,0,0,0.04);transition:all .2s}
+  .card-glass:hover{box-shadow:0 12px 40px rgba(0,0,0,0.06)}
+  
+  /* Inputs */
+  .inp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:15px;color:var(--t);background:white;outline:none;font-family:inherit;transition:all .15s;-webkit-appearance:none;box-shadow:var(--neumorph-shadow-inset)}
+  .inp:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-l),var(--neumorph-shadow-inset)}
+  .inp:disabled{background:var(--bg);color:var(--t2);cursor:not-allowed}
+  
+  /* Labels */
+  .lbl{display:block;font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+  
+  /* Buttons - Modern Flat Primary */
+  .btn{background:var(--primary);color:white;border:none;border-radius:var(--radius-md);padding:12px 24px;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:0 2px 8px rgba(181,82,74,0.3)}
+  .btn:hover{background:var(--primary-d);box-shadow:0 4px 16px rgba(181,82,74,0.4);transform:translateY(-1px)}
+  .btn:active{background:var(--primary-d);transform:translateY(0)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 2px 8px rgba(181,82,74,0.2)}
+  
+  /* Buttons - Outline */
+  .btn-o{background:var(--card);color:var(--primary);border:1.5px solid var(--primary);border-radius:var(--radius-md);padding:10px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;transition:all .15s}
+  .btn-o:hover{background:var(--primary-l);transform:translateY(-1px)}
+  
+  /* Buttons - Small/Secondary */
+  .btn-sm{background:var(--primary-l);color:var(--primary);border:none;border-radius:var(--radius-sm);padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+  .btn-sm:hover{background:var(--primary);color:white}
+  
+  /* Buttons - Delete/Destructive */
+  .btn-del{background:var(--primary-l);color:var(--red);border:none;border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+  .btn-del:hover{background:var(--red);color:white}
+  .btn-del:active{background:#8B2020}
+  
+  /* Buttons - WhatsApp */
+  .btn-wa{background:#25D366;color:white;border:none;border-radius:var(--radius-sm);padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:0 2px 8px rgba(37,211,102,0.3)}
+  .btn-wa:hover{background:#1DB956;box-shadow:0 4px 16px rgba(37,211,102,0.4)}
+  
+  /* Buttons - Edit */
+  .btn-edit{background:var(--primary-l);color:var(--primary-d);border:none;border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+  .btn-edit:hover{background:var(--primary);color:white}
+  
+  /* Buttons - Check/Toggle */
+  .btn-check{background:var(--card);border:1.5px solid var(--border);color:var(--t2);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;box-shadow:var(--neumorph-shadow-sm)}
+  .btn-check:hover{border-color:var(--primary);color:var(--primary)}
+  .btn-check.done{background:var(--primary-l);border-color:var(--green);color:var(--green);box-shadow:0 2px 8px rgba(46,125,82,0.2)}
+  
+  /* Tags */
   .tag{display:inline-block;background:var(--primary-l);color:var(--primary);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600}
-  .tag-g{display:inline-block;background:var(--primary-l);color:var(--green);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600}
-  .tag-gold{display:inline-block;background:var(--primary-l);color:var(--gold);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600}
+  .tag-g{display:inline-block;background:#EDF7F0;color:var(--green);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600}
+  .tag-gold{display:inline-block;background:#FFF8E6;color:var(--gold);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600}
   .tag-past{display:inline-block;background:var(--border);color:var(--t2);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600}
+  
+  /* Rows */
   .row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
   .row:last-child{border-bottom:none}
-  .stat{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:16px 12px;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s}
-  .stat:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(196,130,122,0.15)}
-  .to{background:white;border:1.5px solid var(--border);border-radius:9px;padding:8px 2px;font-size:11px;font-weight:600;cursor:pointer;text-align:center;font-family:inherit;transition:all .12s;color:var(--t);line-height:1.2}
-  .to:hover:not(:disabled){border-color:var(--primary);color:var(--primary)}
-  .to.sel{background:var(--primary);border-color:var(--primary);color:white}
-  .to:disabled{background:#f8f8f8;border-color:#e8e8e8;color:#ccc;cursor:not-allowed}
-  .so{background:white;border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;cursor:pointer;text-align:left;width:100%;font-family:inherit;transition:all .12s;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-  .so.sel{border-color:var(--primary);background:var(--primary-l)}
-  .warn-box{background:var(--warn-bg);border:1px solid #F0D870;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--warn-t)}
+  
+  /* Stats */
+  .stat{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:16px 12px;text-align:center;cursor:pointer;transition:all .15s;box-shadow:var(--flat-shadow)}
+  .stat:hover{transform:translateY(-2px);box-shadow:var(--flat-shadow-hover)}
+  
+  /* Time slots */
+  .to{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:8px 2px;font-size:11px;font-weight:600;cursor:pointer;text-align:center;font-family:inherit;transition:all .12s;color:var(--t);line-height:1.2;box-shadow:var(--neumorph-shadow-sm)}
+  .to:hover:not(:disabled){border-color:var(--primary);color:var(--primary);transform:translateY(-1px);box-shadow:var(--neumorph-shadow)}
+  .to.sel{background:var(--primary);border-color:var(--primary);color:white;box-shadow:0 2px 8px rgba(181,82,74,0.4)}
+  .to:disabled{background:var(--bg);border-color:var(--border);color:var(--t2);cursor:not-allowed;box-shadow:none}
+  
+  /* Service options */
+  .so{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:13px 15px;cursor:pointer;text-align:left;width:100%;font-family:inherit;transition:all .12s;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--neumorph-shadow-sm)}
+  .so:hover{border-color:var(--primary);background:var(--primary-l);transform:translateY(-1px);box-shadow:var(--neumorph-shadow)}
+  .so.sel{border-color:var(--primary);background:var(--primary-l);box-shadow:0 2px 8px rgba(181,82,74,0.3)}
+  
+  /* Warning box */
+  .warn-box{background:var(--warn-bg);border:1px solid #F0D870;border-radius:var(--radius-md);padding:10px 14px;margin-bottom:12px;font-size:13px;color:var(--warn-t)}
+  
+  /* Suggestions */
   .sugg-item{padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:14px;transition:background .12s}
   .sugg-item:last-child{border-bottom:none}
   .sugg-item:hover{background:var(--primary-l)}
+  
+  /* Scrollbar */
   nav::-webkit-scrollbar{display:none}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--t2)}
+  
+  /* Animations */
   @keyframes spin{to{transform:rotate(360deg)}}
   @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
   @keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
   @keyframes remindPing{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
   .slide-in{animation:slideDown .18s ease forwards}
+  .fade-in{animation:fadeIn .2s ease forwards}
+  .slide-up{animation:slideUp .3s ease forwards}
+  
+  /* Gradient utilities */
+  .grad-header{background:var(--grad-header)}
+  .grad-accent{background:var(--grad-accent)}
+  .text-gradient{background:var(--grad-header);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  
+  /* Glass header */
+  .glass-header{background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border)}
+  
+  /* Focus visible */
+  *:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+  
+  /* Selection */
+  ::selection{background:var(--primary-l);color:var(--primary)}
 `}</style> }
 
 /* ══════════════════════════════════════════════════════════════
@@ -933,7 +1051,7 @@ function AccessManager({ userEmail }) {
   )
 }
 
-function SettingsTab({ paletteId, darkMode, savePalette, saveDark, SA, SC, SE, SS, sync, confirm, isAdmin, userEmail, setPH }) {
+function SettingsTab({ paletteId, savePalette, SA, SC, SE, SS, sync, confirm, isAdmin, userEmail, setPH }) {
   const [resetInput, setResetInput] = useState('')
   const [resetDone,  setResetDone]  = useState(false)
   const [resetStep,  setResetStep]  = useState(0)
@@ -968,29 +1086,6 @@ function SettingsTab({ paletteId, darkMode, savePalette, saveDark, SA, SC, SE, S
       <div style={{fontFamily:'Georgia,serif',fontSize:22,fontWeight:600,color:'var(--t)',marginBottom:4}}>Configuración</div>
       <div style={{fontSize:13,color:'var(--t2)',marginBottom:20}}>Personaliza la apariencia del sistema</div>
 
-      {/* ── MODO OSCURO/CLARO ── */}
-      <div className="card" style={{marginBottom:12}}>
-        {sectionTitle('🌗', 'Modo de visualización')}
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-          {[
-            {val:false, label:'Modo claro', icon:'☀️', desc:'Fondo blanco'},
-            {val:true,  label:'Modo oscuro', icon:'🌙', desc:'Fondo oscuro'},
-          ].map(opt => (
-            <button key={String(opt.val)} onClick={()=>saveDark(opt.val)}
-              style={{
-                padding:'16px 12px', borderRadius:14, border:`2px solid ${darkMode===opt.val?'var(--primary)':'var(--border)'}`,
-                background: darkMode===opt.val ? 'var(--primary-l)' : 'var(--card)',
-                cursor:'pointer', textAlign:'center', transition:'all .18s', fontFamily:'inherit',
-              }}>
-              <div style={{fontSize:28,marginBottom:6}}>{opt.icon}</div>
-              <div style={{fontSize:13,fontWeight:700,color:darkMode===opt.val?'var(--primary)':'var(--t)'}}>{opt.label}</div>
-              <div style={{fontSize:11,color:'var(--t2)',marginTop:2}}>{opt.desc}</div>
-              {darkMode===opt.val && <div style={{fontSize:10,color:'var(--primary)',fontWeight:700,marginTop:6}}>✓ Activo</div>}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* ── PALETAS DE COLOR ── */}
       <div className="card" style={{marginBottom:12}}>
         {sectionTitle('🎨', 'Paleta de colores')}
@@ -1002,9 +1097,10 @@ function SettingsTab({ paletteId, darkMode, savePalette, saveDark, SA, SC, SE, S
                 style={{
                   padding:'14px 12px', borderRadius:14,
                   border:`2.5px solid ${active ? pal.primary : 'var(--border)'}`,
-                  background: active ? (darkMode ? '#2A2638' : pal.pl) : 'var(--card)',
+                  background: active ? pal.pl : 'var(--card)',
                   cursor:'pointer', fontFamily:'inherit', transition:'all .18s',
                   display:'flex', alignItems:'center', gap:10,
+                  boxShadow: active ? `0 4px 16px ${pal.primary}33` : 'var(--flat-shadow)',
                 }}>
                 {/* Color swatch */}
                 <div style={{
@@ -1059,11 +1155,11 @@ function SettingsTab({ paletteId, darkMode, savePalette, saveDark, SA, SC, SE, S
 
       {/* ── RESET DEL SISTEMA — solo Administradora ── */}
       {isAdmin && (
-      <div className="card" style={{border:'1.5px solid #FFCCCC',background: darkMode ? '#2A1A1A' : '#FFF8F8'}}>
+      <div className="card" style={{border:'1.5px solid #FFCCCC',background:'#FFF8F8'}}>
         {sectionTitle('⚠️', 'Zona de peligro')}
-        <div style={{background: darkMode ? '#3A2020' : '#FFF0F0', borderRadius:12, padding:'14px 16px', marginBottom:14, border:'1px solid #FFB8B8'}}>
+        <div style={{background:'#FFF0F0', borderRadius:12, padding:'14px 16px', marginBottom:14, border:'1px solid #FFB8B8'}}>
           <div style={{fontWeight:700,fontSize:14,color:'#C03030',marginBottom:4}}>🗑️ Restablecer el sistema</div>
-          <div style={{fontSize:13,color:darkMode?'#CC9090':'#7A3030',lineHeight:1.6}}>
+          <div style={{fontSize:13,color:'#7A3030',lineHeight:1.6}}>
             Esta acción elimina <strong>permanentemente</strong> todas las citas, clientes y gastos registrados. Los servicios y usuarios <strong>no</strong> se eliminan.
           </div>
         </div>
