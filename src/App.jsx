@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { loadData, saveData, fullReset, updateUserRole } from './api.js'
 import AuthShell, { ChangePasswordModal } from './Auth.jsx'
 import ReportsTab from './ReportsTab.jsx'
@@ -298,9 +298,24 @@ export default function App() {
   const [userName,    setUserName]   = useState(() => localStorage.getItem(NAME_KEY)   || '')
   const [showChangePw, setShowChangePw] = useState(false)
   const [userMenuOpen, setUserMenuOpen]  = useState(false)
+  const userMenuRef = useRef(null)
   const [paletteId, setPaletteId] = useState(() => localStorage.getItem(THEME_KEY) || 'rosa')
 
   const savePalette = id  => { localStorage.setItem(THEME_KEY, id);      setPaletteId(id) }
+
+  // Cierra el menú de usuario si se hace clic/tap en cualquier parte fuera de él
+  useEffect(() => {
+    if (!userMenuOpen) return
+    const handleOutside = e => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handleOutside)
+    document.addEventListener('touchstart', handleOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleOutside)
+      document.removeEventListener('touchstart', handleOutside)
+    }
+  }, [userMenuOpen])
 
   const handleLogin  = (email, role='Empleada', name='') => { localStorage.setItem(AUTH_KEY, email); localStorage.setItem(ROLE_KEY, role); localStorage.setItem(NAME_KEY, name); setUserEmail(email); setUserRole(role); setUserName(name) }
   const handleLogout = () => { localStorage.removeItem(AUTH_KEY); localStorage.removeItem(ROLE_KEY); localStorage.removeItem(NAME_KEY); setUserEmail(null); setUserRole('Empleada'); setUserName('') }
@@ -439,7 +454,7 @@ export default function App() {
           <div className="header-actions" style={{display:'flex',alignItems:'center',gap:6,flexShrink:0,flexWrap:'wrap',justifyContent:'flex-end'}}>
             <button onClick={()=>refresh(true)} className="btn-sm" style={{padding:'6px 10px',minWidth:'auto'}} aria-label="Actualizar">↻</button>
             <SyncBadge status={status} lastSync={lastSync}/>
-            <div style={{position:'relative'}}>
+            <div ref={userMenuRef} style={{position:'relative'}}>
               <button onClick={()=>setUserMenuOpen(v=>!v)} className="btn-sm" style={{padding:'6px 10px',display:'flex',alignItems:'center',gap:4,minWidth:'auto'}} aria-label="Menú de usuario">
                 👤 <span className="user-name" style={{maxWidth:100,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:11}}>{userName || (userEmail||'').split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</span>
               </button>
