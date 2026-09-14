@@ -426,17 +426,17 @@ export default function App() {
 
       <header style={{background:'var(--grad-header)',position:'sticky',top:0,zIndex:100,boxShadow:'0 2px 20px rgba(0,0,0,0.15)'}}>
         <div className="header-inner" style={{padding:'12px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
-          <div style={{display:'flex',alignItems:'center',gap:10,minWidth:0,flex:1}}>
+          <div className="header-brand" style={{display:'flex',alignItems:'center',gap:10,minWidth:0,flex:1}}>
             {BIZ_LOGO
-              ? <img src={BIZ_LOGO} alt={BIZ_NAME} style={{width:36,height:36,borderRadius:10,objectFit:'cover',flexShrink:0}}/>
-              : <div style={{fontSize:24}}>{BIZ_EMOJI}</div>
+              ? <img className="header-logo" src={BIZ_LOGO} alt={BIZ_NAME} style={{width:36,height:36,borderRadius:10,objectFit:'cover',flexShrink:0}}/>
+              : <div className="header-logo header-logo-emoji" style={{fontSize:24}}>{BIZ_EMOJI}</div>
             }
             <div style={{minWidth:0}}>
-              <div style={{fontFamily:'Georgia,serif',fontSize:15,color:'white',fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{BIZ_NAME}</div>
-              <div style={{fontSize:8,color:'rgba(255,255,255,0.85)',letterSpacing:'0.1em',textTransform:'uppercase',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{BIZ_SUBTITLE}</div>
+              <div className="biz-name" style={{fontFamily:'Georgia,serif',fontSize:15,color:'white',fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{BIZ_NAME}</div>
+              <div className="biz-subtitle" style={{fontSize:8,color:'rgba(255,255,255,0.85)',letterSpacing:'0.1em',textTransform:'uppercase',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{BIZ_SUBTITLE}</div>
             </div>
           </div>
-          <div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0,flexWrap:'wrap',justifyContent:'flex-end'}}>
+          <div className="header-actions" style={{display:'flex',alignItems:'center',gap:6,flexShrink:0,flexWrap:'wrap',justifyContent:'flex-end'}}>
             <button onClick={()=>refresh(true)} className="btn-sm" style={{padding:'6px 10px',minWidth:'auto'}} aria-label="Actualizar">↻</button>
             <SyncBadge status={status} lastSync={lastSync}/>
             <div style={{position:'relative'}}>
@@ -958,8 +958,8 @@ function GS() { return <style>{`
     .nb{padding:10px 6px;font-size:11px}
     nav{top:52px;padding:0 6px}
     header{padding:10px 12px;top:0}
-    header > div:first-child{flex:1;min-width:0}
-    header > div:last-child{gap:4px}
+    header .header-brand{flex:1;min-width:0}
+    header .header-actions{gap:4px}
     main{padding:16px 12px !important}
     .card{padding:16px;margin-bottom:12px}
     .card-neu,.card-glass{padding:16px;margin-bottom:12px}
@@ -971,7 +971,7 @@ function GS() { return <style>{`
     .so{padding:12px 14px}
     
     /* Hide user name on very small screens, keep only icon */
-    header button span{max-width:60px !important;font-size:10px}
+    header .user-name{max-width:60px !important;font-size:10px}
   }
   
   /* Mobile */
@@ -979,16 +979,26 @@ function GS() { return <style>{`
     :root{--radius-lg:12px;--radius-md:8px;--radius-sm:6px}
     .nb{padding:8px 4px;font-size:10px}
     nav{padding:0 4px}
-    header{padding:8px 10px}
-    header > div:first-child > div > div:first-child{font-size:13px}
-    header > div:first-child > div > div:last-child{font-size:8px}
+    header{padding:7px 10px}
+
+    /* Keep header on ONE row (like desktop), just tighter */
+    header .header-inner{flex-wrap:nowrap !important;gap:6px !important}
+    header .header-brand{gap:6px !important}
+    header .header-actions{gap:4px !important}
+
+    /* Smaller logo + text so the row fits */
+    header .header-logo{width:26px !important;height:26px !important;border-radius:7px !important}
+    header .header-logo-emoji{font-size:20px !important}
+    header .biz-name{font-size:12px !important}
+    header .biz-subtitle{font-size:7px !important;letter-spacing:.05em !important}
+
     main{padding:14px 10px !important}
     .card{padding:14px;margin-bottom:10px}
     .card-neu,.card-glass{padding:14px;margin-bottom:10px}
     .inp{padding:14px 12px;font-size:16px}
     .btn{padding:14px 16px;font-size:14px;min-width:100px}
     .btn-o{padding:12px 14px;font-size:13px}
-    .btn-sm{padding:7px 10px;font-size:12px}
+    .btn-sm{padding:6px 8px;font-size:11px;min-height:34px}
     .stat{padding:14px 10px}
     .to{padding:6px 2px;font-size:10px;min-width:36px;min-height:36px}
     .so{padding:12px 12px}
@@ -999,46 +1009,22 @@ function GS() { return <style>{`
     /* User menu dropdown - full width on mobile */
     header div[style*="position:absolute"]{right:-10px !important;min-width:200px !important}
     
-    /* Hide username text on very small screens */
-    header button span[style*="maxWidth"]{display:none}
-    header button::after{content:'👤';font-size:16px}
-    
-    /* HEADER TWO ROWS ON MOBILE */
-    header .header-inner{
-      flex-direction:column !important;
-      align-items:stretch !important;
-      gap:8px !important;
-    }
-    header .header-inner > div:first-child{
-      order:1;
-      justify-content:center;
-      text-align:center;
-    }
-    header .header-inner > div:last-child{
-      order:2;
-      justify-content:center;
-      width:100%;
-    }
+    /* Hide username text on very small screens, keep icon only */
+    header .user-name{display:none}
   }
-  
-  /* Tablet - header two rows when needed */
+
+  /* Extra-small phones - trim a bit more, still a single row */
+  @media (max-width: 360px) {
+    header{padding:6px 8px}
+    header .header-inner{gap:4px !important}
+    header .header-logo{width:22px !important;height:22px !important}
+    header .biz-name{font-size:11px !important}
+    header .biz-subtitle{display:none} /* drop subtitle, no room */
+  }
+
+  /* Tablet - single row, just a bit tighter */
   @media (min-width: 481px) and (max-width: 768px) {
-    header .header-inner{
-      flex-direction:column;
-      align-items:stretch;
-      gap:8px;
-    }
-    header .header-inner > div:first-child{
-      order:1;
-      justify-content:space-between;
-    }
-    header .header-inner > div:last-child{
-      order:2;
-      justify-content:flex-end;
-      width:100%;
-      padding-top:4px;
-      border-top:1px solid rgba(255,255,255,0.2);
-    }
+    header .header-inner{flex-wrap:nowrap;gap:10px}
   }
   
   /* Animations */
