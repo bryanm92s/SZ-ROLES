@@ -855,8 +855,7 @@ function GS() { return <style>{`
   ======================================== */
   
   /* Modern Flat Card - ELEVATED */
-  .card{background:var(--card);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px;margin-bottom:14px;box-shadow:var(--flat-shadow);transition:box-shadow .2s,transform .2s,border-color .2s;position:relative}
-  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad-header);border-radius:var(--radius-lg) var(--radius-lg) 0 0;opacity:0;transition:opacity .2s}
+  .card{background:var(--card);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px;margin-bottom:14px;box-shadow:var(--flat-shadow);transition:box-shadow .2s,transform .2s;position:relative}
   
   /* Neumorphic Card - DEEP EXTRUSION */
   .card-neu{background:var(--bg);border-radius:var(--radius-lg);border:none;padding:18px;margin-bottom:14px;box-shadow:var(--neumorph-shadow);transition:box-shadow .25s}
@@ -913,7 +912,6 @@ function GS() { return <style>{`
   
   /* Stats - ELEVATED */
   .stat{background:var(--card);border-radius:var(--radius-md);border:1px solid var(--border);padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;box-shadow:var(--flat-shadow);position:relative;overflow:hidden}
-  .stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad-header);opacity:0;transition:opacity .2s}
   
   /* Time slots - NEUMORPHIC */
   .to{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-sm);padding:10px 4px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;font-family:inherit;transition:all .12s;color:var(--t);line-height:1.2;box-shadow:var(--neumorph-shadow-sm);min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;flex-direction:column}
@@ -935,8 +933,7 @@ function GS() { return <style>{`
      :hover on tap and then get "stuck" until the user taps elsewhere) never
      triggers them. Only real pointer devices (mouse/trackpad) get these. */
   @media (hover: hover) and (pointer: fine) {
-    .card:hover{box-shadow:var(--flat-shadow-hover);transform:translateY(-2px);border-color:var(--primary)}
-    .card:hover::before{opacity:1}
+    .card:hover{box-shadow:var(--flat-shadow-hover);transform:translateY(-2px)}
     .card-neu:hover{box-shadow:var(--neumorph-shadow-lg)}
     .card-glass:hover{box-shadow:0 16px 48px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8);transform:translateY(-2px)}
     .btn:hover{background:var(--primary-d);box-shadow:0 6px 20px rgba(181,82,74,0.45);transform:translateY(-2px)}
@@ -947,8 +944,7 @@ function GS() { return <style>{`
     .btn-wa:hover{background:#1DB956;box-shadow:0 6px 20px rgba(37,211,102,0.45);transform:translateY(-1px)}
     .btn-edit:hover{background:var(--primary);color:white;box-shadow:0 4px 12px rgba(181,82,74,0.3)}
     .btn-check:hover{border-color:var(--primary);color:var(--primary);box-shadow:var(--neumorph-shadow)}
-    .stat:hover{transform:translateY(-3px);box-shadow:var(--flat-shadow-hover);border-color:var(--primary)}
-    .stat:hover::before{opacity:1}
+    .stat:hover{transform:translateY(-3px);box-shadow:var(--flat-shadow-hover)}
     .to:hover:not(:disabled){border-color:var(--primary);color:var(--primary);transform:translateY(-2px);box-shadow:var(--neumorph-shadow)}
     .so:hover{border-color:var(--primary);background:var(--primary-l);transform:translateY(-2px);box-shadow:var(--neumorph-shadow)}
     .sugg-item:hover{background:var(--primary-l)}
