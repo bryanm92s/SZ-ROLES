@@ -424,22 +424,22 @@ export default function App() {
       {modal?.type==='confirm' && <Modal msg={modal.msg} onOk={()=>{modal.onOk();setModal(null)}} onCancel={()=>setModal(null)}/>}
       {modal?.type==='info'    && <Modal msg={modal.msg} onOk={()=>setModal(null)} okLabel="Entendido" cancelLabel={null}/>}
 
-      <header className="glass-header" style={{padding:'13px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:100,boxShadow:'0 2px 20px rgba(0,0,0,0.06)'}}>
+      <header style={{background:'var(--grad-header)',padding:'13px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:100,boxShadow:'0 2px 20px rgba(0,0,0,0.15)'}}>
         <div style={{display:'flex',alignItems:'center',gap:11}}>
           {BIZ_LOGO
             ? <img src={BIZ_LOGO} alt={BIZ_NAME} style={{width:38,height:38,borderRadius:10,objectFit:'cover',flexShrink:0}}/>
             : <div style={{fontSize:26}}>{BIZ_EMOJI}</div>
           }
           <div>
-            <div style={{fontFamily:'Georgia,serif',fontSize:15,background:'var(--grad-header)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text',fontWeight:700}}>{BIZ_NAME}</div>
-            <div style={{fontSize:9,color:'var(--t2)',letterSpacing:'0.14em',textTransform:'uppercase'}}>{BIZ_SUBTITLE}</div>
+            <div style={{fontFamily:'Georgia,serif',fontSize:15,color:'white',fontWeight:700}}>{BIZ_NAME}</div>
+            <div style={{fontSize:9,color:'rgba(255,255,255,0.85)',letterSpacing:'0.14em',textTransform:'uppercase'}}>{BIZ_SUBTITLE}</div>
           </div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:8}}>
-          <button onClick={()=>refresh(true)} className="btn-sm" style={{padding:'6px 12px'}}>↻</button>
+          <button onClick={()=>refresh(true)} style={{background:'rgba(255,255,255,0.15)',border:'none',borderRadius:'var(--radius-sm)',padding:'6px 12px',color:'white',fontSize:14,cursor:'pointer',fontFamily:'inherit',fontWeight:600}}>↻</button>
           <SyncBadge status={status} lastSync={lastSync}/>
           <div style={{position:'relative'}}>
-            <button onClick={()=>setUserMenuOpen(v=>!v)} className="btn-sm" style={{padding:'6px 12px',display:'flex',alignItems:'center',gap:5}}>
+            <button onClick={()=>setUserMenuOpen(v=>!v)} style={{background:'rgba(255,255,255,0.15)',border:'none',borderRadius:'var(--radius-sm)',padding:'6px 12px',color:'white',fontSize:13,cursor:'pointer',fontFamily:'inherit',fontWeight:600,display:'flex',alignItems:'center',gap:5}}>
               👤 <span style={{maxWidth:100,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:11}}>{userName || (userEmail||'').split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</span>
             </button>
             {userMenuOpen && (
